@@ -19,9 +19,9 @@ const ReviewsSection = () => {
           <ReviewCorousel reviewCards={reviewCards}/>
         ) : (
           <div className="w-full flex justify-between gap-4">
-            {/* <Skeleton className="w-[350px] h-[200px] rounded-lg" />
             <Skeleton className="w-[350px] h-[200px] rounded-lg" />
-            <Skeleton className="w-[350px] h-[200px] rounded-lg" /> */}
+            <Skeleton className="w-[350px] h-[200px] rounded-lg" />
+            <Skeleton className="w-[350px] h-[200px] rounded-lg" />
           </div>
         )}
       </div>

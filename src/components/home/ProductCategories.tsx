@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const ProductCategories = () => {
   return (
-    <div className="flex flex-col gap-8 px-6 py-8 sm:px-20 sm:py-8 m-10">
+    <div className="flex flex-col gap-8 px-12 py-8 md:px-20 sm:py-8 lg:m-10">
       <div className="flex flex-col gap-3">
         {productData ? (
           <HeadingTwo text="Saree Collection" />
@@ -17,7 +17,7 @@ const ProductCategories = () => {
           <Skeleton className="h-8 w-48" />
         )}
       </div>
-      <div className="flex flex-wrap justify-between gap-6">
+      <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 justify-between gap-10">
         {productData ? (
           productData[0].collections.map((item:any) => (
             <Link href={`${item.type}/collection/${item.collectionType}`} key={uuidv4()}>

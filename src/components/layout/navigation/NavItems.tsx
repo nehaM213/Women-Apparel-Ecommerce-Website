@@ -35,59 +35,6 @@ export function NavItems({title,subItems}:{title:string,subItems?:any[]}) {
                     </ListItem>
                   ))}
                 </div>
-
-                {/* {title==="SAREES" &&
-                <>
-                                <li className="row-span-3">
-                  <NavigationMenuLink asChild>
-                    <a
-                      className="flex h-[550px] w-full select-none flex-col justify-end rounded-md p-6 no-underline outline-none focus:shadow-md relative"
-                      href="/"
-                    >
-                      <div className="z-10 mb-2 mt-4 text-lg font-medium">
-                        SILK SAREES
-                      </div>
-                      <p className="z-10 text-sm leading-tight text-muted-foreground">
-                        Beautifully designed components that you can copy and
-                        paste into your apps. Accessible. Customizable. Open
-                        Source.
-                      </p>
-                        <Image
-                          className="absolute inset-0 object-cover h-fill"
-                          src="/productImages/p1.webp"
-                          alt="Cover Image"
-                          width={500}
-                          height={300}
-                        />
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-                <li className="row-span-3">
-                  <NavigationMenuLink asChild>
-                    <a
-                      className="flex h-[550px] w-full select-none flex-col justify-end rounded-md p-6 no-underline outline-none focus:shadow-md relative"
-                      href="/"
-                    >
-                      <div className="z-10 mb-2 mt-4 text-lg font-medium">
-                        SILK SAREES
-                      </div>
-                      <p className="z-10 text-sm leading-tight text-muted-foreground">
-                        Beautifully designed components that you can copy and
-                        paste into your apps. Accessible. Customizable. Open
-                        Source.
-                      </p>
-                        <Image
-                          className="absolute inset-0 object-cover h-fill"
-                          src="/productImages/p1.webp"
-                          alt="Cover Image"
-                          width={500}
-                          height={300}
-                        />
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-                </> */}
-
               </ul>
             </div>
           </NavigationMenuContent>}

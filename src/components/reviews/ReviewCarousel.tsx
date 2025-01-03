@@ -20,8 +20,6 @@ interface CorouselSingleReviewProps {
 
 const ReviewCorousel = (
  {reviewCards}:{reviewCards:ReviewData[]}) => {
-  // const options: EmblaOptionsType = {};
-
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay()]);
 
   const {
