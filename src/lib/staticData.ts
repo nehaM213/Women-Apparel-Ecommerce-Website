@@ -2,81 +2,73 @@ import { ReviewData } from "./types";
 
 export const reviewCards: ReviewData[] = [
   {
-    name: "Emily",
+    name: "Naina",
     comment:
-      "Well designed unique practice tests which gives good insights on how to prepare for the 11+ exams.",
+      "I just want to take a moment and let you know that i love is pure cotton saree, I am genuinely impressed with the quality. i am excited to wear this saree soon.",
     rating: 4.9,
     shortComment: "Very Helpful Resources!",
     imgSrc: "/review/rev1.jpeg",
   },
   {
-    name: "Oliver",
+    name: "Nikki",
     comment:
-      "I found the practice tests to be extremely useful in preparing for the exams. Great resource!",
+      "I got lot of comments for this saree everyone was like wow ....you really made my day.",
     rating: 4.8,
     shortComment: "Extremely Useful!",
     imgSrc: "/review/rev2.jpg",
   },
   {
-    name: "Isabella",
+    name: "Yashika",
     comment:
-      "The practice tests were comprehensive and helped me understand the exam format better. Highly recommended!",
+      "Hi... It gives me immense happiness in complimenting your products...Your apparels are of top notch quality.. The eye for detail which have gone into designing, colour combination, material etc is commendable..",
     rating: 4.7,
     shortComment: "Comprehensive and Helpful!",
     imgSrc: "/review/rev3.jpeg",
   },
   {
-    name: "James",
+    name: "Pooja",
     comment:
-      "The resources provided a good mix of difficulty levels, which was perfect for my child's preparation.",
+      "Lazuli has become my favourite brand now. Keep doing the good work and keep sharing love and smiles across.",
     rating: 4.9,
     shortComment: "Perfect Mix of Difficulty Levels!",
     imgSrc: "/review/rev1.jpeg",
   },
   {
-    name: "Lucas",
+    name: "Ritika",
     comment:
-      "The practice tests were instrumental in boosting my child's confidence for the upcoming exams. Thank you!",
+      "Hello! | bought my first ever saree from you guys and I got to wear it for my farewell. It was so comfortable and pretty!!! I love everything about your shop",
     rating: 4.8,
     shortComment: "Boosted Confidence!",
     imgSrc: "/review/rev2.jpg",
   },
   {
-    name: "Mia",
+    name: "Trupti",
     comment:
-      "Excellent resource for 11+ preparation. The tests were well-structured and aligned with the actual exam pattern.",
+      "Thanks, ☺️ it's great to be showcasing my favourite saree brand. Have 6-7 of your sarees and will continue to be loyal customer",
     rating: 4.9,
     shortComment: "Well-Structured and Aligned!",
     imgSrc: "/review/rev3.jpeg",
   },
   {
-    name: "Ethan",
+    name: "Shalini",
     comment:
-      "The practice tests were challenging yet manageable. They helped my child focus on weak areas effectively.",
+      "It's really very beautiful and easy to drape.",
     rating: 4.7,
     shortComment: "Challenging Yet Manageable!",
     imgSrc: "/review/rev1.jpeg",
   },
   {
-    name: "Ava",
+    name: "Kajal",
     comment:
-      "As a tutor, I found these practice tests to be invaluable in preparing my students for the 11+ exams. Highly recommended!",
-    rating: 4.9,
-    shortComment: "Invaluable for Tutors!",
-    imgSrc: "/review/rev2.jpg",
-  },
-  {
-    name: "Noah",
-    comment:
-      "The resources were user-friendly and engaging, making the preparation process enjoyable for my child.",
+      "It feels gud to wear clothes made by U. 😊",
     rating: 4.8,
     shortComment: "User-Friendly and Engaging!",
     imgSrc: "/review/rev3.jpeg",
   },
   {
-    name: "Sophia",
+    name: "Shikha",
     comment:
-      "I saw significant improvement in my child's performance after using these practice tests. Thank you for such a helpful resource!",
+      "Beautiful suit fabric with classic dupatta! Unbeatable looks! 🙏",
     rating: 4.9,
     shortComment: "Significant Improvement!",
     imgSrc: "/review/rev1.jpeg",

@@ -4,9 +4,9 @@ import FooterMenu from "./FooterMenu";
 
 export default function Footer() {
   return (
-    <div className="px-8 pt-6 lg:px-20 lg:pt-8">
-      <div className="flex flex-col gap-8 p-8 bg-orange rounded-ss-3xl rounded-se-3xl">
-        <div className="flex items-start justify-start gap-6 ">
+    <div className="px-8 pt-0 lg:px-20 lg:pt-8">
+      <div className="flex flex-col gap-8 p-4 md:p-8 rounded-ss-3xl rounded-se-3xl">
+        <div className="flex md:flex-nowrap flex-wrap items-start justify-start gap-6 ">
           <div className="flex flex-col w-full gap-6 md:w-1/4 ">
             <div>
               <Image
@@ -18,7 +18,7 @@ export default function Footer() {
             </div>
           </div>
           <div className="hidden w-0 border h-60 border-border md:grid"></div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-10 md:gap-4 md:grid-cols-3">
             <FooterMenu
               menuItems={[
                 {
@@ -106,7 +106,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="flex justify-between gap-8 p-8 text-base text-subheading bg-orange">
+      <div className="flex justify-between gap-8 p-4 md:p-8 text-base text-subheading bg-orange">
         <div>© 2014 - 2024 Lazuli By Neha</div>
         <div>
           Pitampura, Delhi, India | Company Number 7302712816

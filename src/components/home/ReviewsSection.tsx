@@ -6,10 +6,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const ReviewsSection = () => {
   return (
-    <div className="flex flex-col gap-12 px-6 py-8 sm:px-20 sm:py-8 m-10">
+    <div className="flex flex-col gap-8 px-12 py-8 md:px-20 sm:py-8 lg:m-10">
       <div className="flex flex-col gap-3 items-center justify-center">
         {reviewCards ? (
-          <HeadingTwo text="What our customers say about Lazuli!" className="font-light" />
+          <HeadingTwo text="What our customers say about Lazuli!" className="font-light text-center" />
         ) : (
           <Skeleton className="h-8 w-96" />
         )}

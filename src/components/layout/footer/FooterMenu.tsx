@@ -14,7 +14,7 @@ export default function FooterMenu({
   return (
     <div className="inline-flex flex-col items-start justify-start gap-3">
       {title && (
-        <div className="text-base font-bold leading-normal text-heading ">
+        <div className="text-base font-bold leading-normal text-heading">
           {title}
         </div>
       )}
@@ -26,7 +26,7 @@ export default function FooterMenu({
         >
           <Link
             href={item.link}
-            className="text-base font-medium leading-normal text-subheading hover:text-link"
+            className="text-base font-medium leading-normal text-subheading hover:text-link text-nowrap"
           >
             {item.label}
           </Link>

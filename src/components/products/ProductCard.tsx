@@ -26,7 +26,7 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
   const category = useParams().category;
 
   return (
-    <div>
+    <div className="w-fit">
       <Card 
         className={`w-[270px] h-[460px] hover:border-black cursor-pointer relative group ${variant === "category" ? "h-[410px]" : "h-[460px]"}`}
         onMouseEnter={() => setIsHovered(true)}

@@ -8,16 +8,6 @@ import { ReviewData } from "@/lib/types";
 import Autoplay from 'embla-carousel-autoplay'
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface CorouselSingleReviewProps {
-  reviewCards: {
-    name: string;
-    comment: string;
-    rating: number;
-    shortComment: string;
-    imgSrc: string;
-  }[];
-}
-
 const ReviewCorousel = (
  {reviewCards}:{reviewCards:ReviewData[]}) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay()]);
@@ -30,8 +20,8 @@ const ReviewCorousel = (
   } = usePrevNextButtons(emblaApi);
 
   return (
-    <section className="max-w-full relative mt-10 md:mt-0">
-      <div
+    <section className="max-w-full relative">
+      {/* <div
         className="flex gap-1/4 justify-end absolute lg:-top-24 -top-16 right-0"
       >
         <PrevButton
@@ -44,7 +34,7 @@ const ReviewCorousel = (
           disabled={nextBtnDisabled}
           aria-label="Right icon"
         />
-      </div>
+      </div> */}
       <div className="relative space-y-4 overflow-hidden" ref={emblaRef}>
         <div className="relative flex gap-4 backface-visibility-hidden">
           <>

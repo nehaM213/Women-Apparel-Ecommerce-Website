@@ -18,7 +18,7 @@ const LatestProducts = () => {
     .slice(0, 4); // Get the latest 4 products
   return (
     // <ProductsSection heading="Just Launched" type="product"/>
-    <div className="flex flex-col gap-8 px-12 py-8 md:px-20 sm:py-8 lg:m-10">
+    <div className="flex flex-col gap-8 px-12 py-8 md:px-15 sm:py-8 xl:m-0 justify-center items-center">
     <div className="flex flex-col gap-3">
       {productData ? (
         <HeadingTwo text="Just Launched" />
@@ -26,10 +26,10 @@ const LatestProducts = () => {
         <Skeleton className="h-8 w-48" />
       )}
     </div>
-    <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 justify-between gap-6">
+    <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 justify-between gap-10 w-fit">
       {productData ? (
         latestProducts.map((product: any) => (
-          <Link href={`/${product.type}/collection/${product.collectionType}/${product.slug}`} key={uuidv4()}>
+          <Link href={`/${product.type}/collection/${product.collectionType}/${product.slug}`} key={uuidv4()} className='w-fit'>
             <ProductCard variant="product" collection={product} />
           </Link>
         ))
