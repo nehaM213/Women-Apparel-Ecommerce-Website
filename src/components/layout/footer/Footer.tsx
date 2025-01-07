@@ -1,10 +1,14 @@
 import React from "react";
 import Image from "next/image";
 import FooterMenu from "./FooterMenu";
+import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
+import Link from "next/link";
+import Newsletter from "./Newsletter";
 
 export default function Footer() {
   return (
     <div className="px-8 pt-0 lg:px-20 lg:pt-8">
+      <Newsletter />
       <div className="flex flex-col gap-8 p-4 md:p-8 rounded-ss-3xl rounded-se-3xl">
         <div className="flex md:flex-nowrap flex-wrap items-start justify-start gap-6 ">
           <div className="flex flex-col w-full gap-6 md:w-1/4 ">
@@ -13,8 +17,19 @@ export default function Footer() {
                 src={"/logo.png"}
                 alt="PiAcademy Logo"
                 width={281}
-                height={38}
+              height={38}
               />
+            </div>
+            <div className="flex lg:justify-center justify-start gap-4">
+              <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <FaFacebookF className="w-6 h-6" />
+              </Link>
+              <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <FaTwitter className="w-6 h-6" />
+              </Link>
+              <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <FaInstagram className="w-6 h-6" />
+              </Link>
             </div>
           </div>
           <div className="hidden w-0 border h-60 border-border md:grid"></div>

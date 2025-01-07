@@ -7,7 +7,7 @@ export const productData = [
         heading: "Cotton Sarees",
         collectionType: "cotton",
         type: "sarees",
-        images: ["/productImages/CottonSaree.webp"],
+        images: ["/productImages/cottonSaree.webp"],
         products: [
           {
             title: "Handwoven Cotton Saree",

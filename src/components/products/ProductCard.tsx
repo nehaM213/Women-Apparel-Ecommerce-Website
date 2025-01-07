@@ -19,9 +19,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { wishlistStore } from "@/store/wishListStore";
 
 const ProductCard = ({variant, collection}: {variant: string; collection: any}) => {
-  const [isLiked, setIsLiked] = useState(false);
+  const { wishlist, addToWishlist, removeFromWishlist } = wishlistStore();
+  const isLiked = wishlist.includes(collection.id);
   const [isHovered, setIsHovered] = useState(false);
   const category = useParams().category;
 
@@ -43,7 +45,7 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
           />
           
           {/* Quick Actions Overlay */}
-          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-3 transition-opacity duration-300 rounded-tr-lg rounded-tl-lg ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <Button 
               variant="secondary" 
               size="sm"
@@ -62,7 +64,11 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
           <button 
             onClick={(e) => {
               e.preventDefault();
-              setIsLiked(!isLiked);
+              if (isLiked) {
+                removeFromWishlist(collection.id);
+              } else {
+                addToWishlist(collection.id);
+              }
             }}
             className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform"
           >
@@ -110,17 +116,6 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
                 <p className="text-lg font-light">₹{collection.price}</p>
                 <ReviewStars rating={collection.rating} />
               </div>
-              {/* <Button 
-                variant="outline" 
-                size="sm"
-                className="hover:bg-black hover:text-white transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // Quick view logic here
-                }}
-              >
-                Quick View
-              </Button> */}
             </div>
           </CardFooter>
         )}

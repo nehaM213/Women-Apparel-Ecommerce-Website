@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 
-export function NavItems({title,subItems}:{title:string,subItems?:any[]}) {
+export function NavItems({title,subItems,type}:{title:string,subItems?:any[],type?:string}) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -21,14 +21,23 @@ export function NavItems({title,subItems}:{title:string,subItems?:any[]}) {
           <NavigationMenuTrigger className="text-lg tracking-menu leading-menu font-light space-y-1 p-3 hover:underline" subItem={subItems ? true : false}>{title}</NavigationMenuTrigger>
           {subItems && 
           <NavigationMenuContent>
-            <div className="">
-              <ul className="p-4 text-nowrap">
+            <div className="text-sm">
+              <ul className="p-3 text-nowrap">
                 <div>
-                  {subItems?.map((subItem:any) => (
+                  {type === "product" && subItems?.map((subItem:any) => (
                     <ListItem
                       key={uuidv4()}
                       title={subItem.collectionType.toUpperCase()}
                       href={`/${subItem.type}/collection/${subItem.collectionType}`}
+                    >
+                      {/* {subItem.description} */}
+                    </ListItem>
+                  ))}
+                  {type === "nav" && subItems?.map((subItem:any) => (
+                    <ListItem
+                      key={uuidv4()}
+                      title={subItem.label}
+                      href={subItem.link}
                     >
                       {/* {subItem.description} */}
                     </ListItem>
