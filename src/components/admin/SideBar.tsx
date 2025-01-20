@@ -23,7 +23,9 @@ const SideBar = () => {
   return (
     <div>
         <div className="bg-gray-800 text-white p-4">
+            <Link href={"/"} >
             <h1 className="text-2xl font-semibold">Lazuli Admin</h1>
+            </Link>
         </div>
         <div className="">
             <ul>

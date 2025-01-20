@@ -1,21 +1,11 @@
 "use client";
 import React from "react";
-import { NavItems } from "@/components/layout/navigation/NavItems";
 import {
-  HiOutlineShoppingBag,
-  HiOutlineUser,
   HiOutlineMenu,
-  HiOutlineChevronRight,
-  HiOutlineSearch,
 } from "react-icons/hi";
-import Link from "next/link";
-import { v4 as uuidv4 } from "uuid";
-import Sticky from "react-stickynode";
-import { productData } from "@/lib/static-data/Products";
 import {
   Drawer,
 } from "@/components/ui/drawer";
-import { Logo } from "@/components/common/Logo";
 import { SearchBar } from "@/components/common/SearchBar";
 import { NavDrawerContent } from "./NavDrawerContent";
 import { MobileNav } from "./MobileNav";
@@ -43,22 +33,6 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
             strokeWidth={1.0}
           />
         </div>
-        <Logo width={400} height={200} imageClass="w-40 sm:w-48 lg:w-56" />
-        <div className="flex justify-center md:items-center items-start pt-1 gap-3">
-          <HiOutlineSearch
-            className="w-8 h-8 cursor-pointer"
-            strokeWidth={1.0}
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-          />
-          <HiOutlineUser className="w-8 h-8 cursor-pointer" strokeWidth={1.0} />
-          <HiOutlineShoppingBag
-            className="w-8 h-8 cursor-pointer"
-            strokeWidth={1.0}
-          />
-        </div>
-        {isSearchOpen && (
-            <SearchBar toggleSearch={setIsSearchOpen} />
-        )}
       </div>
       <MobileNav isSearchOpen={isSearchOpen} toggleSearch={setIsSearchOpen} toggleDrawer={setIsDrawerOpen} />
       {/* sticky Nav bar for desktop */}

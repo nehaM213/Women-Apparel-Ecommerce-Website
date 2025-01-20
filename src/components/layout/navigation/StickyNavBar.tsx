@@ -1,7 +1,7 @@
 import { Logo } from "@/components/common/Logo";
 import { productData } from "@/lib/static-data/Products";
 import React from "react";
-import { HiOutlineSearch } from "react-icons/hi";
+import { HiOutlineSearch, HiOutlineShoppingBag, HiOutlineUser } from "react-icons/hi";
 import Sticky from "react-stickynode";
 import { v4 as uuidv4 } from "uuid";
 import { NavItems } from "./NavItems";
@@ -25,17 +25,9 @@ export const StickyNavBar: React.FC<{
   }
   className="hidden lg:block"
 >
-  <div className={`flex ${isSticky ? "justify-between" : "justify-end" } items-center bg-white z-10 shadow-lg px-10 py-4`}>
-    {isSticky && (
-      <Logo width={150} height={150}/>
-    )}
+  <div className={`flex justify-between items-center bg-white z-10 shadow-lg px-10 py-4`}>
+    <Logo width={400} height={200} imageClass="w-40 h-auto sm:w-48 lg:w-50" />
     <div className="hidden md:flex items-center">
-      {isSticky && (              
-        <HiOutlineSearch
-          className="w-6 h-6 cursor-pointer align-top mr-2"
-          strokeWidth={1.0}
-          onClick={() => toggleSearch(!isSearchOpen)}
-        /> )}
         {isSearchOpen && (
           <SearchBar toggleSearch={toggleSearch} />
         )}
@@ -54,17 +46,23 @@ export const StickyNavBar: React.FC<{
           type="product"
         />
       ))}
-      {/* <Link
-        className="flex items-center text-center no-underline"
-        href="/aboutus"
-        prefetch
-      >
-        <NavItems title="ABOUT US" />
-      </Link> */}
       {moreDropdownItems.map((item:any)=>(
         <NavItems key={uuidv4()} title={item.label} subItems={item.subItems} type="nav" />
       ))}
     </div>
+    <div className="flex justify-center md:items-center items-start pt-1 gap-3">
+          <HiOutlineSearch
+            className="w-8 h-8 cursor-pointer"
+            strokeWidth={1.0}
+            onClick={() => toggleSearch(!isSearchOpen)}
+          />
+          <HiOutlineUser className="w-8 h-8 cursor-pointer" strokeWidth={1.0} />
+          <HiOutlineShoppingBag
+            className="w-8 h-8 cursor-pointer"
+            strokeWidth={1.0}
+          />
+          
+        </div>
   </div>
 </Sticky>
   );
