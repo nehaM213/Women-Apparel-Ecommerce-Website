@@ -22,10 +22,8 @@ import {
   SelectContent,
   SelectValue,
   SelectTrigger,
-  SelectLabel,
 } from "../ui/select";
-import { Collection } from "mongoose";
-import { MultiSelectDropdown } from "../common/MultiSelectDropdown";
+import { Textarea } from "../ui/textarea";
 
 const formSchema = z.object({
   title: z.string().min(1, { message: "Title is required." }),
@@ -35,19 +33,17 @@ const formSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
       message: "Product slug must be in lowercase and can include hyphens.",
     }),
-  price: z.string().min(1, { message: "Price is required." }), // Could be a string to handle different price formats
+  price: z.string().min(1, { message: "Price is required." }),
   category: z.string().min(1, { message: "Category name is required." }),
   quantity: z
     .number()
     .min(1, { message: "Quantity is required." })
     .min(0, { message: "Quantity must be a non-negative number." }),
   description: z.string().optional(),
-  collections: z
-    .array(z.string())
-    .min(1, { message: "Please add atleast one collection." }), // Assuming category is a string here
+  collections: z.string().min(1, { message: "Collection is required." }),
   product_images: z
     .array(z.string())
-    .min(1, { message: "Please add atleast one product image." }), // Assuming URLs or paths as strings
+    .min(1, { message: "Please add atleast one product image." }),
   material: z.string().optional(),
   wash_care: z.string().optional(),
   date_created: z.date().default(new Date()).optional(),
@@ -88,7 +84,7 @@ export function AddProducts() {
       quantity: 0,
       description: "",
       category: "",
-      collections: [],
+      collections: "",
       product_images: [],
       material: "",
       wash_care: "",
@@ -98,32 +94,19 @@ export function AddProducts() {
     },
   });
 
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [availableCollections, setAvailableCollections] = useState<string[]>(
     []
   );
 
-  const options = [
-    { id: 1, label: "Option 1" },
-    { id: 2, label: "Option 2" },
-    { id: 3, label: "Option 3" },
-    { id: 4, label: "Option 4" },
-  ];
-
-  const handleSelectedOptions = (selectedIds: (number | string)[]) => {
-    console.log("Selected options:", selectedIds); // Perform any action with selected option IDs
-  };
-  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-
-  const handleAddImages = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setImages([...images, ...Array.from(event.target.files)]);
-    }
+  const [selectedCollections, setSelectedCollections] = useState<string>("");
+  const handleAddImages = (newImages: string[]) => {
+    setImages((prevImages) => [...prevImages, ...newImages]);
   };
 
   const handleRemoveImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   const generateSlug = (title: string) => {
@@ -154,36 +137,27 @@ export function AddProducts() {
       (option) => option.slug === selectedSlug
     );
     if (selectedCategoryObj) {
-      setAvailableCollections(selectedCategoryObj.collection || []);
-      form.setValue("collections", []); // Reset collection when category changes
+      setAvailableCollections(selectedCategoryObj.collection || "");
+      form.setValue("collections", "");
     } else {
       setAvailableCollections([]);
     }
   };
 
   const handleCollectionToggle = (value: string) => {
-    setSelectedCollections((prev) => {
-      if (prev.includes(value)) {
-        // Remove the value if it's already selected
-        return prev.filter((item) => item !== value);
-      } else {
-        // Add the value if it's not selected
-        return [...prev, value];
-      }
-    });
+    console.log("col val",value)
+    setSelectedCollections(value);
   };
 
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Convert the form values to a more readable format
     const formData = {
       ...values,
+      product_images:images,
       date_created: values.date_created?.toISOString(),
       date_modified: values.date_modified?.toISOString(),
     };
     console.log("Form submitted with values:", formData);
   }
-  // ...
 
   return (
     <Form {...form}>
@@ -255,7 +229,10 @@ export function AddProducts() {
                 <FormLabel>Collections</FormLabel>
                 <FormControl>
                   <Select
-                    value=""
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                    }}
                   >
                     <SelectTrigger variant="form">
                       <SelectValue placeholder="Select Collections" />
@@ -263,7 +240,7 @@ export function AddProducts() {
                     <SelectContent>
                       <SelectGroup>
                         {availableCollections.map((option, index) => (
-                          <SelectItem key={index} value={option} onClick={() => handleCollectionToggle(option)}>
+                          <SelectItem key={index} value={option}>
                             <span className={selectedCollections.includes(option) ? 'font-bold' : ''}>
                               {option}
                             </span>
@@ -275,33 +252,9 @@ export function AddProducts() {
                   </Select>
                 </FormControl>
                 <FormMessage />
-                <div className="mt-2">
-                  {selectedCollections.map((collection, index) => (
-                    <span key={index} className="inline-flex items-center px-2 py-1 text-sm font-medium text-white bg-blue-500 rounded-full mr-2">
-                      {collection}
-                      <button
-                        type="button"
-                        className="ml-1 text-white"
-                        onClick={() => {
-                          const newSelected = selectedCollections.filter((item) => item !== collection);
-                          setSelectedCollections(newSelected);
-                          form.setValue('collections', newSelected);
-                        }}
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ))}
-                </div>
               </FormItem>
             )}
           />
-              <MultiSelectDropdown
-        options={options}
-        selected={handleSelectedOptions}
-        placeholder="Select Collections"
-        width="w-full" // Customize width (optional)
-      />
           <FormField
             control={form.control}
             name="price"
@@ -326,6 +279,10 @@ export function AddProducts() {
                     type="number"
                     placeholder="Product quantity"
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value ? Number(value) : 0); // Convert to number or set to 0 if empty
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -339,7 +296,7 @@ export function AddProducts() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input placeholder="Product description" {...field} />
+                <Textarea {...field} placeholder="Enter wash care instructions" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -365,7 +322,7 @@ export function AddProducts() {
               <FormItem>
                 <FormLabel>Wash Care</FormLabel>
                 <FormControl>
-                  <Input placeholder="Wash care instructions" {...field} />
+                  <Textarea {...field} placeholder="Enter wash care instructions" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -374,14 +331,33 @@ export function AddProducts() {
           <FormField
             control={form.control}
             name="product_images"
-            render={() => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Images</FormLabel>
                 <FormControl>
-                  <Input type="file" multiple onChange={handleAddImages} />
+                  <Input
+                    type="file"
+                    multiple
+                    onChange={(event) => {
+                      if (event.target.files) {
+                        const filesArray = Array.from(event.target.files);
+                        const newImageNames = filesArray.map((file) => {
+                          const extension = file.name.split('.').pop();
+                          console.log("collection",selectedCollections);
+                          return `${selectedCategory}-${form.getValues("collections")}-${form.getValues("product_slug")}.${extension}`; 
+                        });
+                        
+                        // console.log("h");
+                        // console.log("arr", [...images, ...newImageNames]);
+                        // console.log("files",filesArray);
+                        handleAddImages(newImageNames);
+                        field.onChange([...images, ...newImageNames]); // Update form value with new names
+                      }
+                    }}
+                  />
                 </FormControl>
                 <div className="mt-2">
-                  {images.map((image, index) => (
+                  {/* {images.map((image, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <img
                         src={URL.createObjectURL(image)}
@@ -396,7 +372,7 @@ export function AddProducts() {
                         Delete
                       </Button>
                     </div>
-                  ))}
+                  ))} */}
                 </div>
                 <FormMessage />
               </FormItem>
