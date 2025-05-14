@@ -2,9 +2,10 @@
 import dynamic from "next/dynamic";
 import React from 'react';
 import ImageCarousel from '../common/carousel/ImageCarousel';
-const ProductCategories = dynamic(()=>import('./ProductCategories'),{
-  loading: () => <p>Loading...</p>,
-});
+import ProductCategories from "./ProductCategories";
+// const ProductCategories = dynamic(()=>import('./ProductCategories'),{
+//   loading: () => <p>Loading...</p>,
+// });
 const BestSellers = dynamic(()=>import('./BestSellers'),{
   loading: () => <p>Loading...</p>,
 });

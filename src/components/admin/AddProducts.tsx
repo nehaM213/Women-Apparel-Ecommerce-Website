@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,10 @@ import {
   SelectTrigger,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
+import { Dialog, DialogOverlay, DialogContent } from "@/components/ui/dialog";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { useEdgeStore } from "@/lib/edgestore";
+import { FileState, MultiImageDropzone } from "../edgestore/multi-image-dropzone";
 
 const formSchema = z.object({
   title: z.string().min(1, { message: "Title is required." }),
@@ -95,18 +100,65 @@ export function AddProducts() {
   });
 
   const [images, setImages] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [availableCollections, setAvailableCollections] = useState<string[]>(
     []
   );
-
   const [selectedCollections, setSelectedCollections] = useState<string>("");
-  const handleAddImages = (newImages: string[]) => {
-    setImages((prevImages) => [...prevImages, ...newImages]);
+  const [zoomedImage, setZoomedImage] = useState<File | null>(null);
+  const { edgestore } = useEdgeStore();
+
+  const [fileStates, setFileStates] = useState<FileState[]>([]);
+  // const { edgestore } = useEdgeStore();
+  function updateFileProgress(key: string, progress: FileState['progress']) {
+    setFileStates((fileStates) => {
+      const newFileStates = structuredClone(fileStates);
+      const fileState = newFileStates.find(
+        (fileState) => fileState.key === key,
+      );
+      if (fileState) {
+        fileState.progress = progress;
+      }
+      return newFileStates;
+    });
+  }
+
+  const handleAddImages =async  (newFiles: File[]) => {
+    const newImageNames = newFiles.map((file) => file.name);
+    setImages((prevImages) => [...prevImages, ...newImageNames]);
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    await Promise.all(
+      newFiles.map(async (addedFileState) => {
+        try {
+          const res = await edgestore.publicImages.upload({
+            file: addedFileState,
+            onProgressChange: (progress) => {
+              // you can use this to show a progress bar
+              console.log(progress);
+            },
+          });
+          console.log(res);
+        } catch (err) {
+          console.log("file upload error");
+        }
+      }),
+    )
+    
   };
 
   const handleRemoveImage = (index: number) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleZoomImage = (image: File) => {
+    console.log(image);
+    setZoomedImage(image);
+  };
+
+  const handleCloseZoom = () => {
+    setZoomedImage(null);
   };
 
   const generateSlug = (title: string) => {
@@ -142,11 +194,6 @@ export function AddProducts() {
     } else {
       setAvailableCollections([]);
     }
-  };
-
-  const handleCollectionToggle = (value: string) => {
-    console.log("col val",value)
-    setSelectedCollections(value);
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -328,57 +375,129 @@ export function AddProducts() {
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="product_images"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Images</FormLabel>
                 <FormControl>
-                  <Input
+                  <input
                     type="file"
                     multiple
                     onChange={(event) => {
                       if (event.target.files) {
                         const filesArray = Array.from(event.target.files);
-                        const newImageNames = filesArray.map((file) => {
-                          const extension = file.name.split('.').pop();
-                          console.log("collection",selectedCollections);
-                          return `${selectedCategory}-${form.getValues("collections")}-${form.getValues("product_slug")}.${extension}`; 
-                        });
-                        
-                        // console.log("h");
-                        // console.log("arr", [...images, ...newImageNames]);
-                        // console.log("files",filesArray);
-                        handleAddImages(newImageNames);
-                        field.onChange([...images, ...newImageNames]); // Update form value with new names
+                        handleAddImages(filesArray);
                       }
                     }}
+                    accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
                   />
                 </FormControl>
-                <div className="mt-2">
-                  {/* {images.map((image, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt={image.name}
-                        className="w-16 h-16 object-cover"
-                      />
-                      <span>{image.name}</span>
-                      <Button
-                        type="button"
-                        onClick={() => handleRemoveImage(index)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  ))} */}
-                </div>
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
+                <MultiImageDropzone
+        value={fileStates}
+        dropzoneOptions={{
+          maxFiles: 6,
+        }}
+        onChange={(files) => {
+          setFileStates(files);
+        }}
+        onFilesAdded={async (addedFiles) => {
+          // Assuming you have these values in your component's state
+          const productSlug = form.getValues("product_slug"); // Get product_slug from form
+          const category = form.getValues("category"); // Get category from form
+          const collection = form.getValues("collections"); // Get collection from form
+
+          setFileStates([...fileStates, ...addedFiles]);
+
+          await Promise.all(
+            addedFiles.map(async (addedFileState) => {
+              try {
+                if (typeof addedFileState.file === 'string') {
+                  throw new Error('File type is string, expected File');
+                }
+
+                // Generate a unique file name
+                const originalFileName = addedFileState.file.name; // Get the original file name
+                const fileExtension = originalFileName.split('.').pop(); // Get the file extension
+                const uniqueFileName = `${productSlug}_${category}_${collection}.${fileExtension}`; // Construct the new file name
+
+                const res = await edgestore.publicImages.upload({
+                  file: addedFileState.file,
+                  // fileName: uniqueFileName, // Pass the unique file name
+                  onProgressChange: async (progress) => {
+                    updateFileProgress(addedFileState.key, progress);
+                    if (progress === 100) {
+                      await new Promise((resolve) => setTimeout(resolve, 1000));
+                      updateFileProgress(addedFileState.key, 'COMPLETE');
+                    }
+                  },
+                });
+                console.log(res);
+              } catch (err) {
+                updateFileProgress(addedFileState.key, 'ERROR');
+              }
+            }),
+          );
+        }}
+      />
         </div>
+
+              <div
+                className="mt-4"
+              >
+                {images.map((image, index) => (
+                      <div
+                        key={image}
+                        className="flex items-center space-x-2 cursor-move mb-3"
+                      >
+                        {(files[index].type.startsWith("image/")) ? (
+                        <img
+                          src={URL.createObjectURL(files[index])}
+                          alt={image}
+                          className="w-16 h-16 object-cover"
+                          onClick={() => handleZoomImage(files[index])}
+                        />
+                        ) :
+                        (
+                          <video className="w-16 h-16 object-cover" src={URL.createObjectURL(files[index])} autoPlay loop muted onClick={() => handleZoomImage(files[index])} />
+                        )}
+                        <span>{image}</span>
+                        <Button type="button" onClick={() => handleRemoveImage(index)}>
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+              </div>
+
+        {zoomedImage && (
+          <Dialog open={!!zoomedImage} onOpenChange={handleCloseZoom}>
+            <DialogOverlay className="fixed inset-0 bg-slate-600 bg-opacity-20" />
+            <DialogContent className="fixed bg-white p-4 rounded max-h-[90vh] overflow-auto" >
+            <DialogTitle>
+      <VisuallyHidden>Zoomed Image</VisuallyHidden> 
+    </DialogTitle>
+    <DialogDescription>
+      <VisuallyHidden>This dialog displays a zoomed image or video.</VisuallyHidden>
+    </DialogDescription>
+            {(zoomedImage.type.startsWith("image/")) ? (
+              <img
+                src={URL.createObjectURL(zoomedImage)}
+                alt={zoomedImage.name}
+                className="max-w-full max-h-full"
+                onClick={handleCloseZoom}
+              />
+            ):
+            ( 
+              <video className="max-w-full max-h-full" src={URL.createObjectURL(zoomedImage)} autoPlay loop muted onClick={handleCloseZoom} />
+            )}
+            </DialogContent>
+          </Dialog>
+        )}
 
         <Button type="submit">Add Product</Button>
       </form>

@@ -20,12 +20,44 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { wishlistStore } from "@/store/wishListStore";
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem, removeItem } from '@/store/cartSlice';
+import { Toast, ToastProvider, ToastViewport, ToastTitle, ToastDescription } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductCard = ({variant, collection}: {variant: string; collection: any}) => {
+  const dispatch = useDispatch();
   const { wishlist, addToWishlist, removeFromWishlist } = wishlistStore();
   const isLiked = wishlist.includes(collection.id);
   const [isHovered, setIsHovered] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
   const category = useParams().category;
+  const { toast } = useToast()
+
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isInCart) {
+      dispatch(removeItem(collection.id));
+      toast({
+        title: "Product removed from cart",
+        
+      })
+    setIsInCart(false);
+    } else {
+      dispatch(addItem({
+        id: collection.id,
+        title: collection.title,
+        price: collection.price,
+        quantity: 1,
+        images: collection.images,
+      }));
+      toast({
+        title: "Product added to cart",
+      })
+      setIsInCart(true);
+    }
+  };
 
   return (
     <div className="w-fit">
@@ -45,20 +77,16 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
           />
           
           {/* Quick Actions Overlay */}
-          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-3 transition-opacity duration-300 rounded-tr-lg rounded-tl-lg ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          {variant !== "category" && (<div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-3 transition-opacity duration-300 rounded-tr-lg rounded-tl-lg ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <Button 
               variant="secondary" 
               size="sm"
               className="bg-white hover:bg-gray-100 text-black"
-              onClick={(e) => {
-                e.preventDefault();
-                // Add to cart logic here
-              }}
+              onClick={handleAddToCart}
             >
-              <PiShoppingCartSimple className="mr-2" />
-              Add to Cart
+              {isInCart ? "Remove from Cart" : "Add to Cart"}
             </Button>
-          </div>
+          </div>)}
 
           {/* Wishlist Button */}
           <button 

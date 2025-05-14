@@ -5,9 +5,7 @@ import NavigationBar from "@/components/layout/navigation/NavigationBar";
 export default function Page() {
   return (
     <main>
-      <NavigationBar/>
       <Home />
-      <Footer/>
     </main>
   );
 }

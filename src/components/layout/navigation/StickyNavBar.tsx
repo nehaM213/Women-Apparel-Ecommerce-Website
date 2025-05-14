@@ -57,10 +57,12 @@ export const StickyNavBar: React.FC<{
             onClick={() => toggleSearch(!isSearchOpen)}
           />
           <HiOutlineUser className="w-8 h-8 cursor-pointer" strokeWidth={1.0} />
-          <HiOutlineShoppingBag
-            className="w-8 h-8 cursor-pointer"
-            strokeWidth={1.0}
-          />
+          <Link href="/cart">
+            <HiOutlineShoppingBag
+              className="w-8 h-8 cursor-pointer"
+              strokeWidth={1.0}
+            />
+          </Link>
           
         </div>
   </div>

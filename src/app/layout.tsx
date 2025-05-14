@@ -4,6 +4,11 @@ import "./globals.css";
 // import Footer from "@/components/sections/Footer";
 import NavigationBar from "@/components/layout/navigation/NavigationBar";
 import Footer from "@/components/layout/footer/Footer";
+import { EdgeStoreProvider } from "@/lib/edgestore";
+import { Provider } from 'react-redux';
+import store from "@/store/cartStore";
+import { Providers } from "./Providers";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+      <Providers>
+      <NavigationBar/>
+      <EdgeStoreProvider>{children}</EdgeStoreProvider>
+      <Footer/>
+      </Providers>
+      <Toaster />
       </body>
     </html>
   );
