@@ -1,9 +1,9 @@
-import Checkout from '@/components/Checkout'
+import LoginRegister from '@/components/LoginRegister'
 import React from 'react'
 
 const page = () => {
   return (
-    <Checkout />
+    <LoginRegister />
   )
 }
 

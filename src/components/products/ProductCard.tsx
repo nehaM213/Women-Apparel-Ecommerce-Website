@@ -2,16 +2,12 @@ import React, { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
 import ReviewStars from "../reviews/ReviewStars";
 import { Button } from "../ui/button";
-import { PiHeartFill, PiHeartLight, PiShoppingCartSimple } from "react-icons/pi";
-import Link from "next/link";
+import { PiHeartFill, PiHeartLight } from "react-icons/pi";
 import { useParams } from "next/dist/client/components/navigation";
 import {
   Tooltip,
@@ -20,9 +16,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { wishlistStore } from "@/store/wishListStore";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { addItem, removeItem } from '@/store/cartSlice';
-import { Toast, ToastProvider, ToastViewport, ToastTitle, ToastDescription } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 
 const ProductCard = ({variant, collection}: {variant: string; collection: any}) => {
@@ -51,6 +46,9 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
         price: collection.price,
         quantity: 1,
         images: collection.images,
+        type:collection.type,
+        collectionType:collection.collectionType,
+        slug:collection.slug
       }));
       toast({
         title: "Product added to cart",

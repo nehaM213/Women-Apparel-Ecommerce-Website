@@ -1,8 +1,10 @@
 export const productData = [
   {
+    id: 1,
     category: "sarees",
     collections: [
       {
+        id: 101,
         slug: "cotton-saree-collection",
         heading: "Cotton Sarees",
         collectionType: "cotton",
@@ -10,6 +12,7 @@ export const productData = [
         images: ["/productImages/cottonSaree.webp"],
         products: [
           {
+            id: 1001,
             title: "Handwoven Cotton Saree",
             images: [
               "/productImages/cottonSaree1.jpg",
@@ -28,6 +31,7 @@ export const productData = [
             collectionType: "cotton",
           },
           {
+            id: 1002,
             title: "Printed Cotton Saree",
             images: [
               "/productImages/cottonSaree2.webp",
@@ -48,6 +52,7 @@ export const productData = [
         ],
       },
       {
+        id: 102,
         slug: "silk-saree-collection",
         heading: "Silk Sarees",
         collectionType: "silk",
@@ -55,6 +60,7 @@ export const productData = [
         images: ["/productImages/silkSaree1.webp"],
         products: [
           {
+            id: 1003,
             title: "Banarasi Silk Saree",
             images: [
               "/productImages/silkSaree1.webp",
@@ -72,6 +78,7 @@ export const productData = [
             collectionType: "silk",
           },
           {
+            id: 1004,
             title: "Kanchipuram Silk Saree",
             images: [
               "/productImages/silkSaree2.webp",
@@ -92,6 +99,7 @@ export const productData = [
         ],
       },
       {
+        id: 103,
         slug: "banarasi-saree-collection",
         heading: "Banarasi Sarees",
         collectionType: "banarasi",
@@ -99,6 +107,7 @@ export const productData = [
         images: ["/productImages/banarasiSaree1.webp"],
         products: [
           {
+            id: 1005,
             title: "Red Banarasi Saree",
             images: [
               "/productImages/banarasiSaree1.webp",
@@ -119,6 +128,7 @@ export const productData = [
         ],
       },
       {
+        id: 104,
         slug: "georgett-saree-collection",
         heading: "Georgett Sarees",
         collectionType: "georgett",
@@ -126,6 +136,7 @@ export const productData = [
         images: ["/productImages/georgetteSaree1.webp"],
         products: [
           {
+            id: 1006,
             title: "Georgett Saree",
             images: [
               "/productImages/georgetteSaree1.webp",
@@ -147,9 +158,11 @@ export const productData = [
     ],
   },
   {
+    id: 2,
     category: "suits",
     collections: [
       {
+        id: 201,
         slug: "cotton-suit-collection",
         heading: "Cotton Suits",
         collectionType: "cotton",
@@ -157,6 +170,7 @@ export const productData = [
         images: ["/productImages/cottonSuit1.jpg"],
         products: [
           {
+            id: 2001,
             title: "Printed Cotton Suit",
             images: [
               "/productImages/cottonSuit1.webp",
@@ -176,6 +190,7 @@ export const productData = [
         ],
       },
       {
+        id: 202,
         slug: "silk-suit-collection",
         heading: "Silk Suits",
         collectionType: "silk",
@@ -183,6 +198,7 @@ export const productData = [
         images: ["/productImages/silkSuit1.jpg"],
         products: [
           {
+            id: 2002,
             title: "Embroidered Silk Suit",
             images: [
               "/productImages/silkSuit1.webp",
@@ -205,9 +221,11 @@ export const productData = [
     ],
   },
   {
+    id: 3,
     category: "jewellery",
     collections: [
       {
+        id: 301,
         slug: "necklaces-collection",
         heading: "Necklaces Collection",
         collectionType: "necklaces",
@@ -215,6 +233,7 @@ export const productData = [
         images: ["/productImages/necklace1.jpg"],
         products: [
           {
+            id: 3001,
             title: "Silver Necklace",
             images: [
               "/productImages/necklace1.jpg",
@@ -235,6 +254,7 @@ export const productData = [
         ],
       },
       {
+        id: 302,
         slug: "earrings-collection",
         heading: "Earrings Collection",
         collectionType: "earrings",
@@ -242,6 +262,7 @@ export const productData = [
         images: ["/productImages/earring.webp"],
         products: [
           {
+            id: 3002,
             title: "Gold Plated Earrings",
             images: [
               "/productImages/earring.webp",
@@ -260,6 +281,7 @@ export const productData = [
         ]
       },
       {
+        id: 303,
         slug: "bangles-collection",
         heading: "Bangles Collection",
         collectionType: "bangles",
@@ -267,6 +289,7 @@ export const productData = [
         images: ["/productImages/goldBangle.webp"],
         products: [
           {
+            id: 3003,
             title: "Gold Plated Bangles",
             images: [
               "/productImages/goldBangle.webp",
@@ -287,9 +310,11 @@ export const productData = [
     ],
   },
   {
+    id: 4,
     category: "shawls",
     collections: [
       {
+        id: 401,
         slug: "pashmina-shawl-collection",
         heading: "Pashmina Shawl Collection",
         collectionType: "pashmina",
@@ -297,6 +322,7 @@ export const productData = [
         images: ["/productImages/shawl1.webp"],
         products: [
           {
+            id: 4001,
             title: "Pashmina Wool Shawl",
             images: [
               "/productImages/shawl1.webp",

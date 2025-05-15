@@ -6,6 +6,9 @@ interface CartItem {
   price: number;
   quantity: number;
   images: string[];
+  type: string;
+  collectionType:string;
+  slug:string
 }
 
 interface CartState {
@@ -23,9 +26,9 @@ const cartSlice = createSlice({
     addItem: (state, action: PayloadAction<CartItem>) => {
       const existingItem = state.items.find(item => item.id === action.payload.id);
       if (existingItem) {
-        existingItem.quantity += action.payload.quantity;
+        existingItem.quantity += 1;
       } else {
-        state.items.push(action.payload);
+        state.items.push({ ...action.payload, quantity: 1 });
       }
     },
     removeItem: (state, action: PayloadAction<string>) => {
