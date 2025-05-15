@@ -1,6 +1,6 @@
 // src/store/cartStore.ts
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, Persistor } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 import cartReducer from './cartSlice';
 
@@ -22,7 +22,7 @@ const store = configureStore({
 // Define RootState type
 export type RootState = ReturnType<typeof store.getState>;
 
-let persistor;
+let persistor: Persistor | undefined;
 if (isBrowser) {
   persistor = persistStore(store);
 }

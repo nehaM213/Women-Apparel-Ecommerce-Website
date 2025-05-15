@@ -8,8 +8,12 @@ import { AppProps } from 'next/app';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-    {children}
-    </PersistGate>
-    </Provider>;
+    {persistor ? (
+      <PersistGate loading={null} persistor={persistor}>
+        {children}
+      </PersistGate>
+    ) : (
+      children
+    )}
+  </Provider>;
 }
