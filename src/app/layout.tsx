@@ -25,12 +25,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-      <Providers>
-      <NavigationBar/>
-      <EdgeStoreProvider>{children}</EdgeStoreProvider>
-      <Footer/>
-      </Providers>
-      <Toaster />
+        <Providers>
+          <NavigationBar/>
+          <EdgeStoreProvider>
+            {children}
+          </EdgeStoreProvider>
+          <Footer/>
+        </Providers>
+        <Toaster />
       </body>
     </html>
   );

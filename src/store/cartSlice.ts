@@ -7,7 +7,7 @@ interface CartItem {
   quantity: number;
   images: string[];
   type: string;
-  collectionType:string;
+  collectionType: string;
   slug:string
 }
 
@@ -28,7 +28,8 @@ const cartSlice = createSlice({
       if (existingItem) {
         existingItem.quantity += 1;
       } else {
-        state.items.push({ ...action.payload, quantity: 1 });
+        const newItem: CartItem = { ...action.payload, quantity: 1 };
+        state.items.push(newItem);
       }
     },
     removeItem: (state, action: PayloadAction<string>) => {

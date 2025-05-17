@@ -33,7 +33,7 @@ const Cart: React.FC = () => {
             {cartItems.map((item:any) => (
               <div key={item.id} className="flex items-center bg-white shadow-md rounded-lg p-4">
                 <Link href={`${item.type}/collection/${item.collectionType}/${item.slug}`} className="flex items-center flex-grow">
-                  <Image src={item.images[0]} alt={item.title} width={100} height={100} className="rounded-md" />
+                  <Image src={item.images[0]} alt={item.title} width={100} height={100} className="rounded-md w-auto" />
                   <div className="ml-4">
                     <h2 className="text-xl font-semibold">{item.title}</h2>
                     <p className="text-gray-600">Price: ${item.price}</p>
