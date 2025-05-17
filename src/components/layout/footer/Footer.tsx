@@ -17,7 +17,8 @@ export default function Footer() {
                 src={"/logo.png"}
                 alt="PiAcademy Logo"
                 width={281}
-              height={38}
+                height={38}
+                className="w-auto"
               />
             </div>
             <div className="flex lg:justify-center justify-start gap-4">
