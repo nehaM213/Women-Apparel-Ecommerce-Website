@@ -87,7 +87,7 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
           </div>)}
 
           {/* Wishlist Button */}
-          <button 
+          {/* <button 
             onClick={(e) => {
               e.preventDefault();
               if (isLiked) {
@@ -103,7 +103,7 @@ const ProductCard = ({variant, collection}: {variant: string; collection: any}) 
             ) : (
               <PiHeartLight className="text-xl" />
             )}
-          </button>
+          </button> */}
         </CardContent>
 
         {/* Product Info Section */}

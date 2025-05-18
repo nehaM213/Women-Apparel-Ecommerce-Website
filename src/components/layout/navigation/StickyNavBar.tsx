@@ -9,7 +9,7 @@ import { SearchBar } from "@/components/common/SearchBar";
 import Link from "next/link";
 import { moreDropdownItems } from "@/lib/static-data/Navbar";
 import { useSelector } from "react-redux";
-import { RootState } from "@/store/cartStore";
+import { RootState } from "@/store/store";
 
 export const StickyNavBar: React.FC<{
   isSearchOpen: boolean;
@@ -62,9 +62,7 @@ export const StickyNavBar: React.FC<{
             strokeWidth={1.0}
             onClick={() => toggleSearch(!isSearchOpen)}
           />
-          <Link href="/login" className="flex items-center">
-            <HiOutlineUser className="w-8 h-8 cursor-pointer" strokeWidth={1.0} />
-          </Link>
+          <NavItems type="user" subItems={[]}/>
           <Link href="/cart" className="relative">
             <HiOutlineShoppingBag
               className="w-8 h-8 cursor-pointer"

@@ -12,13 +12,17 @@ import {
 } from "@/components/ui/navigation-menu"
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
+import { HiOutlineUser } from "react-icons/hi";
 
-export function NavItems({title,subItems,type}:{title:string,subItems?:any[],type?:string}) {
+export function NavItems({title,subItems,type}:{title?:string,subItems?:any[],type?:string}) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="text-lg tracking-menu leading-menu font-light space-y-1 p-3 hover:underline" subItem={subItems ? true : false}>{title}</NavigationMenuTrigger>
+          {type !== "user" ? 
+          (<NavigationMenuTrigger className="text-lg tracking-menu leading-menu font-light space-y-1 p-3 hover:underline" subItem={subItems ? true : false}>{title}</NavigationMenuTrigger>) : (<NavigationMenuTrigger className="text-lg tracking-menu leading-menu font-light space-y-1 p-3">
+            <HiOutlineUser className="w-8 h-8 cursor-pointer" strokeWidth={1.0} />
+          </NavigationMenuTrigger> )}
           {subItems && 
           <NavigationMenuContent>
             <div className="text-sm">
@@ -42,6 +46,23 @@ export function NavItems({title,subItems,type}:{title:string,subItems?:any[],typ
                       {/* {subItem.description} */}
                     </ListItem>
                   ))}
+                  {type === "user" && (
+                    <>
+                      <ListItem
+                      title="Login/Signup"
+                      href="/login"
+                    />
+                    <ListItem
+                      title="Orders"
+                      href="/"
+                    />
+                    <ListItem
+                      title="Track Order"
+                      href="/"
+                    />
+                    </>
+                  )
+                  }
                 </div>
               </ul>
             </div>
@@ -52,7 +73,7 @@ export function NavItems({title,subItems,type}:{title:string,subItems?:any[],typ
   )
 }
 
-const ListItem = React.forwardRef<
+export const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, href, ...props }, ref) => {

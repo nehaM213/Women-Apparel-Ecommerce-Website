@@ -1,7 +1,7 @@
 // app/Providers.tsx
 "use client";
 
-import store, { persistor } from "@/store/cartStore";
+import store, { persistor } from "@/store/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import { useEffect, useState } from "react";
@@ -15,7 +15,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <Provider store={store}>
-      {/* {children} */}
       {isClient ? (
         <PersistGate loading={null} persistor={persistor!}>
           {children}
