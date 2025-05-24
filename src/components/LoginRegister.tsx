@@ -9,17 +9,64 @@ import { useToast } from "@/hooks/use-toast";
 
 const LoginRegister: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [identifier, setIdentifier] = useState('');
+  const [form, setForm] = useState({ identifier: "", otp: "" });
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
   const router = useRouter();
   const { toast } = useToast()
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [message, setMessage] = useState('');
+  
 
-  async function handleSignup(e: React.FormEvent) {
-    e.preventDefault();
-    if (form.password !== form.confirm) {
-      toast({ title: "Passwords do not match" });
-      return;
+  const sendOtp = async () => {
+    try{
+    const res = await fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier }),
+    });
+
+    if(!res.ok){
+      const data = await res.json();
+      setMessage(data.message || "Failed to send OTP");
     }
+    setOtpSent(true);
+    } catch (error) {
+      setMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const verifyOtp = async () => {
+    const res = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, otp }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setMessage(`Logged in as ${data.user.identifier}`);
+    } else {
+      const data = await res.json();
+      setMessage(data.message || "Failed to verify OTP");
+    }
+  };
+
+  const handleRequestOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    console.log("Requesting OTP for:", identifier);
+    await sendOtp();
+    setLoading(false);
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // if (form.password !== form.confirm) {
+    //   toast({ title: "Passwords do not match" });
+    //   return;
+    // }
 
     setLoading(true);
     const res = await fetch("/api/signup", {
@@ -31,8 +78,8 @@ const LoginRegister: React.FC = () => {
     if (res.ok) {
       // Auto-login
       await signIn("credentials", {
-        email: form.email,
-        password: form.password,
+        email: form.identifier,
+        // password: form.password,
         redirect: false,
       });
       router.push("/dashboard");
@@ -47,8 +94,8 @@ const LoginRegister: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     const res = await signIn("credentials", {
-      email: form.email,
-      password: form.password,
+      email: form.identifier,
+      // password: form.password,
       redirect: false,
     });
 
@@ -72,26 +119,70 @@ const LoginRegister: React.FC = () => {
         />
       </div>
       <div className="flex-1 flex flex-col justify-center align-top p-4">
-        <h1 className="text-3xl font-bold mb-6">{isLogin ? 'Login' : 'Signup'}</h1>
-        <form onSubmit={isLogin ? handleLogin : handleSignup} className="bg-white shadow-md rounded-lg p-6  space-y-4">
-          {!isLogin && (
-            <Input placeholder="Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+        <h1 className="text-3xl font-bold mb-6">Login/Signup With OTP</h1>
+        <form onSubmit={handleRequestOTP} className="bg-white shadow-md rounded-lg p-6 space-y-4">
+          <div className="flex items-center mb-4">
+            <input
+              type="radio"
+              id="mobile"
+              name="identifierType"
+              checked={isMobile}
+              onChange={() => setIsMobile(true)}
+              className="mr-2"
+            />
+            <label htmlFor="mobile" className="mr-4">Mobile</label>
+            <input
+              type="radio"
+              id="email"
+              name="identifierType"
+              checked={!isMobile}
+              onChange={() => setIsMobile(false)}
+              className="mr-2"
+            />
+            <label htmlFor="email">Email</label>
+          </div>
+          <Input
+            placeholder={isMobile ? "Phone Number" : "Email"}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            required
+          />
+          {!otpSent ? (
+            <Button type="submit" disabled={loading} className="mt-4 w-full">
+              {loading ? "Requesting OTP..." : "Request OTP"}
+            </Button>
+          ) : (
+            <>
+              <Input
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+              />
+              <Button 
+                onClick={(e) => { 
+                  e.preventDefault(); // Prevent form submission
+                  verifyOtp(); // Call verifyOtp function
+                }} 
+                className="mt-4 w-full"
+              >
+                Verify OTP
+              </Button>
+            </>
           )}
-          <Input type="email" placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
-          <Input type="password" placeholder="Password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required />
-          {!isLogin && (
-            <Input type="password" placeholder="Confirm Password" value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} required />
-          )}
-          <Button type="submit" disabled={loading} className="mt-4 w-full">{loading ? (isLogin ? "Logging in..." : "Creating...") : (isLogin ? "Login" : "Sign up")}</Button>
+          <p>{message}</p>
+          <p className="mt-4 text-center">
+            A 4 digit OTP will be sent to your {isMobile ? "phone number" : "email"}.
+          </p>
         </form>
+        <p className="mt-4 text-center">Or continue with</p>
+        <div className="flex justify-center space-x-4">
+          <Button variant="outline">Facebook</Button>
+          <Button variant="outline">Google</Button>
+        </div>
         <p className="mt-4 text-center">
-          {isLogin ? 'Don\'t have an account?' : 'Already have an account?'}
-          <Button
-            onClick={() => setIsLogin(!isLogin)}
-            variant="link"
-            className="underline p-0 ml-2"
-          >
-            {isLogin ? 'Signup' : 'Login'}
+          <Button variant="link" className="underline p-0">
+            Login with email & password
           </Button>
         </p>
       </div>
