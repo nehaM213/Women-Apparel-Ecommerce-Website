@@ -13,6 +13,10 @@ A fully responsive and modern E-commerce website built for selling women's appar
 - Responsive design for mobile, tablet, and desktop
 - Authentication (needs to be implemented)
 - Admin dashboard (needs to be implemented)
+- Login/Signup : Users can log in or sign up using their mobile number or email address.
+- OTP Verification: (pending)An OTP (One-Time Password) is sent to the user's mobile or email for verification.
+- OTP Storage: The OTP is securely stored in Redis for quick access and validation.
+- JWT Authentication: After successful OTP verification, a JWT (JSON Web Token) is issued for secure authentication and session management.
 
 ## 🚀 Tech Stack
 
@@ -23,6 +27,8 @@ A fully responsive and modern E-commerce website built for selling women's appar
 - [Tailwind CSS](https://tailwindcss.com/)
 - [MongoDB](https://www.mongodb.com/)
 - [Stripe](https://stripe.com/) for payments
+- [JWT (JSON Web Token)](https://jwt.io/) for authentication
+- [Upstash Redis](https://upstash.com/) for OTP storage
 
 ## 📂 Project Structure
 
@@ -103,6 +109,27 @@ yarn dev
 - [ ] Order tracking
 - [ ] Payment gateway integration
 - [ ] Admin dashboard for inventory management
+
+### How It Works
+
+1. **User Registration/Login**: Users enter their mobile number or email address to initiate the login/signup process.
+2. **OTP Generation**: An OTP is generated and sent to the provided mobile number or email.
+3. **OTP Storage**: The generated OTP is stored in Redis for validation.
+4. **OTP Verification**: Users enter the received OTP to verify their identity.
+5. **JWT Token Issuance**: Upon successful verification, a JWT token is generated and returned to the user for authenticated access to protected routes.
+
+### Installation
+
+1. Clone the repository.
+2. Install dependencies using `npm install`.
+3. Set up your environment variables for Redis and JWT.
+4. Start the application using `npm start`.
+
+### Usage
+
+- Navigate to the login/signup page.
+- Enter your mobile number or email to receive an OTP.
+- Input the OTP to complete the login/signup process.
 
 
 
