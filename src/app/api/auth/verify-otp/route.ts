@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
 
   let user = await getUserByIdentifier(identifier);
   if (!user) {
+    console.log("creating user");
     user = await createUser(identifier);
   }
 
@@ -29,5 +30,14 @@ export async function POST(req: NextRequest) {
 
   const token = signJwt({ identifier });
 
-  return NextResponse.json({ token, user }, { status: 200 });
+  const response = NextResponse.json({ message: "Logged in",user });
+  response.cookies.set('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    maxAge: 60 * 60 * 24, // 1 day
+  });
+  // return NextResponse.json({ token, user }, { status: 200 });
+  return response;
 }

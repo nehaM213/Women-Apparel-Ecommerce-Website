@@ -1,5 +1,9 @@
+// lib/auth.ts
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
+import User from "@/models/User";
+import { connectToMongoDb } from "@/lib/db";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -10,21 +14,22 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const res = await fetch(`${process.env.NEXTAUTH_URL}/api/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: credentials?.email,
-            password: credentials?.password,
-          }),
+        await connectToMongoDb();
+        const user = await User.findOne({
+          email: credentials?.email,
+          password: credentials?.password,
         });
-
-        const user = await res.json();
-
-        if (!res.ok || !user) return null;
-
-        return user;
+        if (!user) return null;
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+        };
       },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
 
@@ -35,16 +40,16 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.user = user; // Add user object to token
+        token.id = user.id;
+        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user = token.user as {
-        name?: string | null;
-        email?: string | null;
-        image?: string | null;
-        id?: string;
+      session.user = {
+        id: String(token.id || ""),
+        email: token.email!,
+        name: session.user?.name || null,
       };
       return session;
     },

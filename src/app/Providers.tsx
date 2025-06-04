@@ -5,6 +5,7 @@ import store, { persistor } from "@/store/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import { useEffect, useState } from "react";
+import { SessionProvider } from "next-auth/react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [isClient, setIsClient] = useState(false);
@@ -14,6 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
+    <SessionProvider>
     <Provider store={store}>
       {isClient ? (
         <PersistGate loading={null} persistor={persistor!}>
@@ -23,5 +25,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
         children
       )}
     </Provider>
+    </SessionProvider>
   );
 }

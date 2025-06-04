@@ -13,8 +13,11 @@ import {
 import Link from "next/link";
 import { v4 as uuidv4 } from 'uuid';
 import { HiOutlineUser } from "react-icons/hi";
+import { signOut, useSession } from "next-auth/react";
 
 export function NavItems({title,subItems,type}:{title?:string,subItems?:any[],type?:string}) {
+  const { data: session, status } = useSession();
+  console.log("user session ",session);
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -48,10 +51,22 @@ export function NavItems({title,subItems,type}:{title?:string,subItems?:any[],ty
                   ))}
                   {type === "user" && (
                     <>
+                    {session?.user ? 
+                      (
+                        <>
+                    <p className="text-lg tracking-menu leading-menu font-500">Welcome</p>
+                    <ListItem
+                    title="Logout"
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                  />
+                  </>
+                  ) :
+                    (
                       <ListItem
                       title="Login/Signup"
-                      href="/login"
+                      href="/login" 
                     />
+                    ) }
                     <ListItem
                       title="Orders"
                       href="/"

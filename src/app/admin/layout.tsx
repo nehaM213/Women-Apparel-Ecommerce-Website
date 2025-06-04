@@ -9,12 +9,27 @@ export const metadata: Metadata = {
     "LazuliByNeha - Sarees, ready to wear sarees, dupatta, shawls, suits and more",
 };
 
+const menuItems=[
+  {
+      name: 'Products',
+      link: '/admin'
+  },
+  {
+      name: 'Orders',
+      link: '/admin/orders'
+  },
+  {
+      name: 'Users',
+      link: '/admin/users'
+  }
+]
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <EdgeStoreProvider>
       <div className="flex flex-col lg:flex-row h-screen">
         <div className="w-full overflow-auto border-r-2 lg:w-1/5 bg-gray md:bg-none border-border h-full">
-          <SideBar />
+          <SideBar menuItems={menuItems} heading="Lazuli Admin" />
         </div>
         <div className="flex flex-col w-full">{children}</div>
       </div>

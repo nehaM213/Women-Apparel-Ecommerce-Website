@@ -20,3 +20,4 @@ export interface HeadingThreeProps {
   variant?: "default" | "primary" | "secondary";
   size?: "default" | "sm" | "lg" | "xl";
 }
+
