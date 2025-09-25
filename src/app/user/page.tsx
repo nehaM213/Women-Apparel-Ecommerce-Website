@@ -4,11 +4,11 @@ import { useSession } from 'next-auth/react';
 import Profile from '@/components/user/Profile';
 
 const page = () => {
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
   return (
     <div>
-      <h1>Hello! {session?.user?.name}</h1>
-        <Profile />
+      {/* <h1>Hello! {session?.user?.name}</h1> */}
+        {/* <Profile /> */}
     </div>
   )
 }

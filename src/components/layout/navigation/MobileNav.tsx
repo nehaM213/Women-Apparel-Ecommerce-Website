@@ -8,7 +8,8 @@ export const MobileNav: React.FC<{
     isSearchOpen: boolean;
     toggleSearch: React.Dispatch<React.SetStateAction<boolean>>;
     toggleDrawer: React.Dispatch<React.SetStateAction<boolean>>;
-  }> = ({ isSearchOpen, toggleSearch, toggleDrawer }) => (
+    toggleCart: React.Dispatch<React.SetStateAction<boolean>>;
+  }> = ({ isSearchOpen, toggleSearch, toggleDrawer, toggleCart }) => (
     <Sticky enabled={true} top={0} innerZ={10} className="lg:hidden">
     <div className="flex justify-between lg:pr-10 pr-4 pl-4 pt-2 lg:pl-0 bg-white shadow-lg">
       <div className="flex justify-center items-start md:items-center">
@@ -33,6 +34,7 @@ export const MobileNav: React.FC<{
         <HiOutlineShoppingBag
           className="w-8 h-8 cursor-pointer"
           strokeWidth={1.0}
+          onClick={() => toggleCart(true)}
         />
       </div>
       {isSearchOpen && (

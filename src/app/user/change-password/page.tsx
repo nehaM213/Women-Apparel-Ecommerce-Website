@@ -1,7 +1,10 @@
- export default function ChangePassword() {
-    return (
-        <div>
-            <h1>Change Password</h1>
-        </div>
-    )
+import ChangePassword from '@/components/user/ChangePassword'
+import React from 'react'
+
+const page = () => {
+  return (
+    <ChangePassword />
+  )
 }
+
+export default page

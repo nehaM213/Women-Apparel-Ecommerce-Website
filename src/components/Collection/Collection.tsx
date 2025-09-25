@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 
 const Collection = ({ filteredProducts }: any) => {
-  console.log(filteredProducts);
+  // console.log(filteredProducts);
   const { category, collection } = useParams();
   const collectionName = collection
     ?.toString()

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { moreDropdownItems } from "@/lib/static-data/Navbar";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 export const StickyNavBar: React.FC<{
   isSearchOpen: boolean;
@@ -20,6 +21,11 @@ export const StickyNavBar: React.FC<{
 }> = ({ isSearchOpen, toggleSearch, toggleDrawer, toggleSticky, isSticky }) => {
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [isCartOpen, setIsCartOpen] = React.useState(false);
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <Sticky
@@ -63,17 +69,18 @@ export const StickyNavBar: React.FC<{
             onClick={() => toggleSearch(!isSearchOpen)}
           />
           <NavItems type="user" subItems={[]}/>
-          <Link href="/cart" className="relative">
+          <button className="relative" onClick={() => setIsCartOpen(true)} aria-label="Open cart">
             <HiOutlineShoppingBag
               className="w-8 h-8 cursor-pointer"
               strokeWidth={1.0}
             />
-            {cartCount > 0 && (
+            {isMounted && cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1 transform translate-x-1 -translate-y-1">
                 {cartCount}
               </span>
             )}
-          </Link>
+          </button>
+          <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
         </div>
       </div>
     </Sticky>

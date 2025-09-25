@@ -25,9 +25,8 @@ const storage =
     : createNoopStorage();
 
 const persistConfig = {
-  key: "root",
+  key: "cart",
   storage,
-  whitelist: ["cart"], // only cart will be persisted
 };
 
 const persistedReducer = persistReducer(persistConfig, cartReducer);

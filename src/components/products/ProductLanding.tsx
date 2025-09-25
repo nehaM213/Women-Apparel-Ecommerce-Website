@@ -11,7 +11,7 @@ interface ProductDetails {
 }
 
 const ProductLanding = ({ productDetails }: { productDetails: ProductDetails }) => {
-  console.log(productDetails);
+  // console.log(productDetails);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 

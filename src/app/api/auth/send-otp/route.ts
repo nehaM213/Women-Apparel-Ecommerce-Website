@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         react: OtpEmail({ otp }),
       });
     }
-    console.log(`OTP for ${identifier}: ${otp}`);
+    // console.log(`OTP for ${identifier}: ${otp}`);
     await saveOtp(identifier, otp);
     return NextResponse.json({ message: 'OTP sent' }, { status: 200 });
   } catch (error) {

@@ -2,10 +2,11 @@
 import Link from 'next/link'
 import React from 'react'
 import { usePathname } from "next/navigation";
+import { signOut } from 'next-auth/react';
 
 const SideBar = ({menuItems,heading}:{menuItems:any[],heading?:string}) => {
       const pathname = usePathname();
-        const isPathActive = (path: string) => pathname.includes(path);
+      const isPathActive = (path: string) => pathname.includes(path);
   return (
     <div>
         {heading && (
@@ -22,7 +23,12 @@ const SideBar = ({menuItems,heading}:{menuItems:any[],heading?:string}) => {
                     <li className={`p-2 shadow-lg hover:bg-black hover:text-white ${
                         isPathActive(item.link)
                           && "border-black border-2"
-                      }`}>
+                      }`}
+                      
+                      onClick={item.action ? (e) => {
+                        e.preventDefault();
+                        signOut({ callbackUrl: '/' })
+                      } : undefined}>
                         
                             {item.name}
                         
@@ -30,6 +36,7 @@ const SideBar = ({menuItems,heading}:{menuItems:any[],heading?:string}) => {
                     </Link>
                 ))}
             </ul>
+            
         </div>
     </div>
   )

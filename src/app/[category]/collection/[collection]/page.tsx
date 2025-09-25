@@ -20,7 +20,7 @@ const Page = ({ params: { category, collection } }: PageProps) => {
     product.category.toLowerCase() === categoryName );  
   const filteredCollection = filteredProducts[0].collections.filter(collection => 
     collection.collectionType.toLowerCase() === collectionName);
-  console.log(filteredCollection);
+  // console.log(filteredCollection);
 
   return (
     <div>
