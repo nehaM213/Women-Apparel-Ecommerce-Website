@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 type Address = {
   firstName?: string;
@@ -41,6 +45,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
   initialData,
 }) => {
   const [formState, setFormState] = useState<Address>(initialAddress);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialData && open) {
@@ -66,118 +71,136 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
     onAddAddress(formState);
-    setFormState(initialAddress);
-    onClose();
+    setSubmitting(false);
   };
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-full max-w-md relative">
-        <button
-          className="absolute top-2 right-2 text-gray-500"
-          onClick={onClose}
-        >
-          &times;
-        </button>
-        <h3 className="text-lg font-bold mb-4">{initialData ? 'Edit Address' : 'Add New Address'}</h3>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="flex gap-2">
-            <input
-              name="firstName"
-              value={formState.firstName}
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{initialData ? 'Edit Address' : 'Add New Address'}</DialogTitle>
+          <DialogDescription>
+            Please provide your delivery details. Fields marked with * are required.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="firstName">First Name *</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                value={formState.firstName}
+                onChange={handleChange}
+                placeholder="First Name"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="lastName">Last Name *</Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                value={formState.lastName}
+                onChange={handleChange}
+                placeholder="Last Name"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="addressLine1">Address Line 1 *</Label>
+            <Input
+              id="addressLine1"
+              name="addressLine1"
+              value={formState.addressLine1}
               onChange={handleChange}
-              placeholder="First Name"
-              className="border rounded px-2 py-1 flex-1"
-              required
-            />
-            <input
-              name="lastName"
-              value={formState.lastName}
-              onChange={handleChange}
-              placeholder="Last Name"
-              className="border rounded px-2 py-1 flex-1"
+              placeholder="House no., Street, Area"
               required
             />
           </div>
-          {/* <input
-            name="company"
-            value={formState.company}
-            onChange={handleChange}
-            placeholder="Company"
-            className="border rounded px-2 py-1 w-full"
-          /> */}
-          <input
-            name="addressLine1"
-            value={formState.addressLine1}
-            onChange={handleChange}
-            placeholder="Address Line 1"
-            className="border rounded px-2 py-1 w-full"
-            required
-          />
-          <input
-            name="addressLine2"
-            value={formState.addressLine2}
-            onChange={handleChange}
-            placeholder="Address Line 2"
-            className="border rounded px-2 py-1 w-full"
-          />
-          <div className="flex gap-2">
-            <input
-              name="city"
-              value={formState.city}
+
+          <div className="space-y-1.5">
+            <Label htmlFor="addressLine2">Address Line 2</Label>
+            <Input
+              id="addressLine2"
+              name="addressLine2"
+              value={formState.addressLine2}
               onChange={handleChange}
-              placeholder="City"
-              className="border rounded px-2 py-1 flex-1"
-              required
-            />
-            <input
-              name="country"
-              value={formState.country}
-              onChange={handleChange}
-              placeholder="Country"
-              className="border rounded px-2 py-1 flex-1"
-              required
+              placeholder="Landmark, Building, etc."
             />
           </div>
-          <div className="flex gap-2">
-            <input
-              name="postalCode"
-              value={formState.postalCode}
-              onChange={handleChange}
-              placeholder="Postal/Zip Code"
-              className="border rounded px-2 py-1 flex-1"
-              required
-            />
-            <input
-              name="contactNumber"
-              value={formState.contactNumber}
-              onChange={handleChange}
-              placeholder="Contact Number"
-              className="border rounded px-2 py-1 flex-1"
-              required
-            />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="city">City *</Label>
+              <Input
+                id="city"
+                name="city"
+                value={formState.city}
+                onChange={handleChange}
+                placeholder="City"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="country">Country *</Label>
+              <Input
+                id="country"
+                name="country"
+                value={formState.country}
+                onChange={handleChange}
+                placeholder="Country"
+                required
+              />
+            </div>
           </div>
-          <label className="flex items-center gap-2">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="postalCode">Postal/Zip Code *</Label>
+              <Input
+                id="postalCode"
+                name="postalCode"
+                value={formState.postalCode}
+                onChange={handleChange}
+                placeholder="e.g., 110001"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="contactNumber">Contact Number *</Label>
+              <Input
+                id="contactNumber"
+                name="contactNumber"
+                value={formState.contactNumber}
+                onChange={handleChange}
+                placeholder="e.g., +91 9876543210"
+                required
+              />
+            </div>
+          </div>
+
+          <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               name="default"
               checked={!!formState.default}
               onChange={handleChange}
             />
-            Set as default
+            Set as default address
           </label>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          >
-            {initialData ? 'Update Address' : 'Save Address'}
-          </button>
+
+          <div className="flex gap-2 justify-end pt-2">
+            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={submitting}>{initialData ? 'Update' : 'Save'}</Button>
+          </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

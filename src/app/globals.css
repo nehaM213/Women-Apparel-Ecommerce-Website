@@ -82,4 +82,16 @@
   body {
     @apply bg-background text-foreground font-neue-haas-grotesk;
   }
+  
+  /* Prevent scrollbar jump - Modern approach */
+  html {
+    scrollbar-gutter: stable;
+  }
+  
+  /* Fallback for older browsers */
+  @supports not (scrollbar-gutter: stable) {
+    body {
+      overflow-x: hidden;
+    }
+  }
 }

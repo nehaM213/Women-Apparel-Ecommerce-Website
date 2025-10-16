@@ -23,6 +23,7 @@ export const StickyNavBar: React.FC<{
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const [isMounted, setIsMounted] = React.useState(false);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
+  const stickyDebounceRef = React.useRef<number | null>(null);
   React.useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -32,9 +33,14 @@ export const StickyNavBar: React.FC<{
       enabled={true}
       top={0}
       innerZ={10}
-      onStateChange={({ status }) =>
-        toggleSticky(status === Sticky.STATUS_FIXED)
-      }
+      onStateChange={({ status }) => {
+        if (stickyDebounceRef.current) {
+          window.clearTimeout(stickyDebounceRef.current);
+        }
+        stickyDebounceRef.current = window.setTimeout(() => {
+          toggleSticky(status === Sticky.STATUS_FIXED);
+        }, 100);
+      }}
       className="hidden lg:block"
     >
       <div className={`flex justify-between items-center bg-white z-10 shadow-lg px-10 py-4`}>
@@ -63,13 +69,19 @@ export const StickyNavBar: React.FC<{
           ))}
         </div>
         <div className="flex justify-center md:items-center items-start pt-1 gap-3">
-          <HiOutlineSearch
-            className="w-8 h-8 cursor-pointer"
-            strokeWidth={1.0}
+          <button
+            aria-label="Toggle search"
+            aria-expanded={isSearchOpen}
             onClick={() => toggleSearch(!isSearchOpen)}
-          />
+            className="p-1"
+          >
+            <HiOutlineSearch
+              className="w-8 h-8 cursor-pointer"
+              strokeWidth={1.0}
+            />
+          </button>
           <NavItems type="user" subItems={[]}/>
-          <button className="relative" onClick={() => setIsCartOpen(true)} aria-label="Open cart">
+          <button className="relative" onClick={() => setIsCartOpen(true)} aria-label="Open cart" aria-expanded={isCartOpen}>
             <HiOutlineShoppingBag
               className="w-8 h-8 cursor-pointer"
               strokeWidth={1.0}

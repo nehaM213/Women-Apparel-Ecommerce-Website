@@ -1,7 +1,9 @@
-export default function OrderHistory() {
+import OrderHistory from "@/components/user/OrderHistory";
+
+export default function Page() {
     return (
         <div>
-            <h1>Order History</h1>
+            <OrderHistory />
         </div>
     )
 }

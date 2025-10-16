@@ -15,7 +15,7 @@ export default function Footer() {
             <div>
               <Image
                 src={"/logo.png"}
-                alt="PiAcademy Logo"
+                alt="lazuli Logo"
                 width={281}
                 height={38}
                 className="w-auto"

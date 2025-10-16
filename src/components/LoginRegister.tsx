@@ -30,73 +30,18 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ checkout, onSuccess }) =>
   const { data: session, status } = useSession();
   const [isPasswordLogin, setIsPasswordLogin] = useState(false);
   const [password, setPassword] = useState("");
-  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
-
   // Get cart data for Razorpay
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const totalAmount = cartItems.reduce((total: number, item: any) => total + item.price * item.quantity, 0);
 
-  const startRazorpay = async () => {
-    try {
-      if (!razorpayLoaded || !window.Razorpay) {
-        console.error('Razorpay not loaded yet');
-        return;
-      }
-
-      const razorpayRes = await fetch('/api/payment/razorpay/create-order', {
-        method: 'POST',
-      });
-      const razorpayData = await razorpayRes.json();
-      const options: any = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-        amount: totalAmount * 100,
-        currency: "INR",
-        name: 'Lazuli By Neha',
-        description: 'Checkout',
-        order_id: razorpayData.id,
-        handler: function (response: any) {
-          console.log('Payment successful:', response);
-        },
-        theme: { color: "#3399cc" }
-      };
-      
-      const rzp1 = new window.Razorpay(options);
-      rzp1.open();
-      
-      // Call onSuccess to close the dialog
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (err) {
-      console.error('Razorpay init error:', err);
-    }
-  };
-
   // Handle authentication success
   useEffect(() => {
     if (status === "authenticated" && checkout) {
-      // Check if this is from OAuth or direct login
-      const isFromOAuth = typeof window !== "undefined" && 
-        localStorage.getItem("checkout_after_oauth") === "1";
-      
-      if (isFromOAuth) {
-        localStorage.removeItem("checkout_after_oauth");
-        localStorage.removeItem("checkout_return_url");
-        
-        // Wait for Razorpay to be loaded
-        const checkRazorpay = () => {
-          if (razorpayLoaded && window.Razorpay) {
-            setTimeout(() => {
-              startRazorpay();
-            }, 100);
-          } else {
-            setTimeout(checkRazorpay, 100);
-          }
-        };
-        checkRazorpay();
-      }
+      // on checkout flow, go to checkout page and close dialog if provided
+      if (onSuccess) onSuccess();
+      router.push("/checkout");
     }
-  }, [status, checkout, razorpayLoaded]);
+  }, [status, checkout]);
 
   const sendOtp = async () => {
     setMessage("");
@@ -173,8 +118,9 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ checkout, onSuccess }) =>
     });
     console.log("response", res);
     if (res?.ok) {
-      if (checkout && onSuccess) {
-        onSuccess();
+      if (checkout) {
+        if (onSuccess) onSuccess();
+        router.push("/checkout");
       } else {
         console.log("dashboard");
         router.push("/user/profile");
@@ -188,14 +134,7 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ checkout, onSuccess }) =>
 
   return (
     <>
-      {checkout && (
-        <Script 
-          src="https://checkout.razorpay.com/v1/checkout.js" 
-          onLoad={() => setRazorpayLoaded(true)}
-          onError={() => console.error('Failed to load Razorpay script')}
-        />
-      )}
-      
+      {/* Razorpay script removed */}
       <div className={checkout ? "w-full max-w-md mx-auto" : "container mx-auto p-4 flex flex-col md:flex-row"}>
         {!checkout && (
           <div className="flex-1 flex justify-center items-start pt-6">
@@ -317,13 +256,8 @@ const LoginRegister: React.FC<LoginRegisterProps> = ({ checkout, onSuccess }) =>
               variant="outline"
               onClick={() => {
                 if (checkout) {
-                  try {
-                    if (typeof window !== "undefined") {
-                      localStorage.setItem("checkout_after_oauth", "1");
-                    }
-                  } catch {}
                   signIn("google", { 
-                    callbackUrl: window.location.href
+                    callbackUrl: "/checkout"
                   });
                 } else {
                   signIn("google", { callbackUrl: "/user/profile" });

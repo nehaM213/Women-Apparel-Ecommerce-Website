@@ -11,17 +11,11 @@ const razorpay = new Razorpay({
 // const GuestOrder = mongoose.models.GuestOrder || mongoose.model('GuestOrder');
 
 export async function POST(req: Request) {
-    // await connectToMongoDb();
-    // const { orderId } = await req.json();
-    // const order = await GuestOrder.findById(orderId);
-    // if (!order) {
-    //     return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-    // }
-
-    const totalAmount = 100;
+    await connectToMongoDb();
+    const { amount, orderId } = await req.json();
     try {
         const razorpayOrder = await razorpay.orders.create({
-            amount: Math.round(totalAmount * 100), // amount in paise
+            amount: amount, // amount in paise
             currency: 'INR',
             receipt: "receipt_" + Math.random().toString(36).substring(7),
             // notes: {
@@ -29,6 +23,12 @@ export async function POST(req: Request) {
             //     orderId: order._id.toString(),
             // },
         });
+
+        // If an orderId is provided, persist the Razorpay order id on it
+        if (orderId) {
+            const Order = (await import('@/lib/models/order')).default;
+            await Order.findByIdAndUpdate(orderId, { razorpayOrderId: razorpayOrder.id });
+        }
 
         return NextResponse.json({ id: razorpayOrder.id }, { status: 200 });
     } catch (error) {
