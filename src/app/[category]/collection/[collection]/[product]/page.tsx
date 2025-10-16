@@ -2,42 +2,34 @@ import ProductLanding from '@/components/products/ProductLanding'
 import { productData } from '@/lib/static-data/Products'
 import { notFound } from 'next/navigation'
 
-interface PageProps {
-  params: {
-    category: string
-    collection: string
-    product: string
-  }
+type PageParams = {
+  category: string
+  collection: string
+  product: string
 }
 
-const Page = ({ params }: PageProps) => {
-  const { category, collection, product } = params
-  const categoryData = productData.find(
-    (cat) => cat.category === category
-  )
+// 👇 Notice: params is a Promise so we await it
+interface PageProps {
+  params: Promise<PageParams>
+}
 
-  if (!categoryData) {
-    notFound()
-  }
+const Page = async ({ params }: PageProps) => {
+  const { category, collection, product } = await params
+
+  const categoryData = productData.find((cat) => cat.category === category)
+  if (!categoryData) notFound()
 
   const collectionData = categoryData.collections.find(
     (col) => col.collectionType === collection
   )
-  if (!collectionData) {
-    notFound()
-  }
+  if (!collectionData) notFound()
 
-  // Find the product
   const productDetails = collectionData.products.find(
     (prod) => prod.slug === product
   )
-  if (!productDetails) {
-    notFound()
-  }
+  if (!productDetails) notFound()
 
-  return (
-    <ProductLanding productDetails={productDetails} />
-  )
+  return <ProductLanding productDetails={productDetails} />
 }
 
 export default Page

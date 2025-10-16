@@ -3,11 +3,11 @@ import Order from '@/lib/models/order';
 import OrderConfirmation from '@/components/OrderConfirmation';
 
 type PageProps = {
-  params: { orderId: string };
+  params: Promise<{ orderId: string }>
 };
 
 export default async function Page({ params }: PageProps) {
-  const { orderId } = params || {};
+  const { orderId } = await params;
 
   await connectToMongoDb();
 
@@ -50,5 +50,3 @@ export default async function Page({ params }: PageProps) {
 
   return <OrderConfirmation order={normalizedOrder} />;
 }
-
-
