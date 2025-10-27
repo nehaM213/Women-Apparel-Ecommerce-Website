@@ -1,8 +1,9 @@
 "use client";
-import React, { FC, useState, useCallback } from "react";
+import React, { FC, useState, useCallback, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\+[1-9]\d{1,14}$/;
@@ -11,6 +12,7 @@ interface OtpLoginFormProps {
   onSuccess?: () => void;
   checkout?: boolean;
 }
+
 const OtpLoginForm: FC<OtpLoginFormProps> = ({ checkout, onSuccess }) => {
   const [isMobile, setIsMobile] = useState(true);
   const [identifier, setIdentifier] = useState("");
@@ -18,6 +20,14 @@ const OtpLoginForm: FC<OtpLoginFormProps> = ({ checkout, onSuccess }) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // 🧹 Clear input when switching between mobile/email
+  useEffect(() => {
+    setIdentifier("");
+    setOtp("");
+    setOtpSent(false);
+    setMessage("");
+  }, [isMobile]);
 
   const validate = useCallback(() => {
     if (isMobile && !PHONE_REGEX.test(identifier)) {
@@ -77,24 +87,12 @@ const OtpLoginForm: FC<OtpLoginFormProps> = ({ checkout, onSuccess }) => {
     setLoading(false);
   }, [sendOtp]);
 
-  const renderMessage = () => (
-    message && (
-      <div
-        className="mt-2 text-sm text-center text-red-600"
-        aria-live="assertive"
-        role="alert"
-      >
-        {message}
-      </div>
-    )
-  );
-
   return (
     <form
       onSubmit={handleRequestOTP}
-      aria-label="OTP login/signup form"
-      className="space-y-4"
+      className="bg-white shadow-md rounded-lg p-6 space-y-4"
     >
+      {/* Mobile / Email Toggle */}
       <div className="flex items-center mb-4">
         <input
           type="radio"
@@ -104,9 +102,7 @@ const OtpLoginForm: FC<OtpLoginFormProps> = ({ checkout, onSuccess }) => {
           onChange={() => setIsMobile(true)}
           className="mr-2"
         />
-        <label htmlFor="mobile" className="mr-4">
-          Mobile
-        </label>
+        <label htmlFor="mobile" className="mr-4">Mobile</label>
         <input
           type="radio"
           id="email"
@@ -117,32 +113,33 @@ const OtpLoginForm: FC<OtpLoginFormProps> = ({ checkout, onSuccess }) => {
         />
         <label htmlFor="email">Email</label>
       </div>
+
+      {/* Input Field */}
       {isMobile ? (
         <PhoneInput
           country={"in"}
           value={identifier}
-          onChange={phone => setIdentifier(phone.startsWith("+") ? phone : "+" + phone)}
+          onChange={(phone) => {
+            if (!phone.startsWith("+")) phone = "+" + phone;
+            setIdentifier(phone);
+          }}
           inputClass="!w-full !text-black !border-none bg-white text-sm placeholder:text-gray-400"
           containerClass="!w-full h-10 rounded-md border border-gray-300 bg-white pr-10 py-0.5 text-sm placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          inputStyle={{ width: "100%" }}
           placeholder="Phone Number"
-          aria-label="Mobile number"
         />
       ) : (
         <Input
           placeholder="Email"
+          type="email"
           value={identifier}
-          onChange={e => setIdentifier(e.target.value)}
+          onChange={(e) => setIdentifier(e.target.value)}
           required
-          aria-label="Email address"
         />
       )}
+
+      {/* OTP Flow */}
       {!otpSent ? (
-        <Button
-          type="submit"
-          disabled={loading}
-          className="mt-4 w-full"
-        >
+        <Button type="submit" disabled={loading} className="mt-4 w-full">
           {loading ? "Requesting OTP..." : "Request OTP"}
         </Button>
       ) : (
@@ -150,9 +147,8 @@ const OtpLoginForm: FC<OtpLoginFormProps> = ({ checkout, onSuccess }) => {
           <Input
             placeholder="Enter OTP"
             value={otp}
-            onChange={e => setOtp(e.target.value)}
+            onChange={(e) => setOtp(e.target.value)}
             required
-            aria-label="Enter OTP"
           />
           <Button
             type="button"
@@ -163,7 +159,10 @@ const OtpLoginForm: FC<OtpLoginFormProps> = ({ checkout, onSuccess }) => {
           </Button>
         </>
       )}
-      {renderMessage()}
+
+      {message && (
+        <div className="mt-2 text-sm text-center text-red-600">{message}</div>
+      )}
     </form>
   );
 };

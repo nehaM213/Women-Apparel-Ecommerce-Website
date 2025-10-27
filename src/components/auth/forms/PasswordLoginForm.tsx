@@ -45,8 +45,7 @@ const PasswordLoginForm: FC<PasswordLoginFormProps> = ({ checkout, onSuccess }) 
   return (
     <form
       onSubmit={handleSubmit}
-      aria-label="Password login form"
-      className="space-y-4"
+      className="bg-white shadow-md rounded-lg p-6 space-y-4"
     >
       <Input
         type="email"
@@ -54,7 +53,6 @@ const PasswordLoginForm: FC<PasswordLoginFormProps> = ({ checkout, onSuccess }) 
         value={identifier}
         onChange={e => setIdentifier(e.target.value)}
         required
-        aria-label="Email address"
       />
       <Input
         type="password"
@@ -62,8 +60,6 @@ const PasswordLoginForm: FC<PasswordLoginFormProps> = ({ checkout, onSuccess }) 
         value={password}
         onChange={e => setPassword(e.target.value)}
         required
-        aria-label="Password"
-        autoComplete="current-password"
       />
       <Button type="submit" disabled={loading} className="mt-4 w-full">
         {loading ? "Logging in..." : "Login"}
