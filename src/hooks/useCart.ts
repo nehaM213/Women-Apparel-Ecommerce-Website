@@ -1,11 +1,17 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { removeItem, updateQuantity } from "@/store/cartSlice";
 import { useCallback, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import {
+  removeItem,
+  updateQuantity,
+  clearCart,
+  selectCartTotalQuantity,
+  selectCartTotalAmount,
+} from "@/store/cartSlice";
 
-interface CartItem {
+export interface CartItem {
   id: string;
   title: string;
   price: number;
@@ -17,32 +23,34 @@ interface CartItem {
 }
 
 export const useCart = () => {
-  const dispatch = useDispatch();
-  const cartItems = useSelector((state: RootState) => state.cart.items) as CartItem[];
-  
-  const totalAmount = useMemo(() => 
-    cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
-    [cartItems]
+  const dispatch = useDispatch<AppDispatch>();
+  const cartItems = useSelector(
+    (state: RootState) => state.cart.items
+  ) as CartItem[];
+  const totalAmount = useSelector(selectCartTotalAmount);
+  const itemCount = useSelector(selectCartTotalQuantity);
+
+  const handleUpdateQuantity = useCallback(
+    (id: string, quantity: number) => {
+      if (quantity < 1) return;
+      dispatch(updateQuantity({ id, quantity }));
+    },
+    [dispatch]
   );
 
-  const itemCount = useMemo(() => 
-    cartItems.reduce((total, item) => total + item.quantity, 0),
-    [cartItems]
+  const handleRemoveItem = useCallback(
+    (id: string) => {
+      dispatch(removeItem(id));
+    },
+    [dispatch]
   );
 
-  const handleUpdateQuantity = useCallback((id: string, quantity: number) => {
-    if (quantity < 1) return;
-    dispatch(updateQuantity({ id, quantity }));
-  }, [dispatch]);
-
-  const handleRemoveItem = useCallback((id: string) => {
-    dispatch(removeItem(id));
-  }, [dispatch]);
-
-  const clearCart = useCallback(() => {
+  const handleClearCart = useCallback(() => {
     // This would need to be implemented in the cart slice
-    // dispatch(clearCart());
+    dispatch(clearCart());
   }, [dispatch]);
+
+  const isEmpty = useMemo(() => cartItems.length === 0, [cartItems]);
 
   return {
     cartItems,
@@ -50,7 +58,7 @@ export const useCart = () => {
     itemCount,
     updateQuantity: handleUpdateQuantity,
     removeItem: handleRemoveItem,
-    clearCart,
-    isEmpty: cartItems.length === 0
+    clearCart: handleClearCart,
+    isEmpty,
   };
 };

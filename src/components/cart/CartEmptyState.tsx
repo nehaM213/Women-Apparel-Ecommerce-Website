@@ -1,35 +1,44 @@
 "use client";
 
-import React from "react";
+import React, { memo, useCallback } from "react";
 import Link from "next/link";
 
+/**
+ * 🛍️ CartEmptyState — Displayed when the cart has no items
+ * - Accessible and keyboard-friendly
+ * - Memoized for performance
+ */
 interface CartEmptyStateProps {
   onClose?: () => void;
 }
 
-const CartEmptyState: React.FC<CartEmptyStateProps> = React.memo(({ onClose }) => {
-  const handleContinueShopping = React.useCallback(() => {
-    if (onClose) {
-      onClose();
-    }
+const CartEmptyState: React.FC<CartEmptyStateProps> = memo(({ onClose }) => {
+  const handleContinueShopping = useCallback(() => {
+    onClose?.(); // concise optional chaining
   }, [onClose]);
 
   return (
-    <div className="flex flex-col items-center justify-center py-8 text-center">
-      <p className="text-sm text-muted-foreground mb-4">
+    <section
+      role="region"
+      aria-label="Empty cart message"
+      className="flex flex-col items-center justify-center py-10 text-center select-none"
+    >
+      <p className="text-base text-muted-foreground mb-5">
         Your cart is empty.
       </p>
-      <Link 
-        href="/" 
+      <Link
+        href="/"
         onClick={handleContinueShopping}
-        className="inline-block border rounded px-4 py-2 hover:bg-gray-50 transition-colors"
+        prefetch
+        className="inline-flex items-center justify-center rounded-md border px-5 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+        aria-label="Continue shopping"
       >
-        Continue shopping
+        Continue Shopping
       </Link>
-    </div>
+    </section>
   );
 });
 
-CartEmptyState.displayName = 'CartEmptyState';
+CartEmptyState.displayName = "CartEmptyState";
 
 export default CartEmptyState;

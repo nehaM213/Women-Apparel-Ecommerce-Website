@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { HiOutlineUser } from "react-icons/hi";
 import { signOut, useSession } from "next-auth/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import LoginRegister from "@/components/LoginRegister";
+import LoginRegister from "@/components/auth/LoginRegister";
 
 export function NavItems({title,subItems,type}:{title?:string,subItems?:any[],type?:string}) {
   const { data: session, status } = useSession();

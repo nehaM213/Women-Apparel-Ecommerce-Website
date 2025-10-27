@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    // allow your remote images
     remotePatterns: [
       {
         protocol: 'https',
@@ -9,6 +10,8 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    // allow specific quality values for <Image quality={...} />
+    qualities: [75, 100],
   },
 };
 

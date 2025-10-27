@@ -1,26 +1,37 @@
 "use client"
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useDispatch } from 'react-redux';
+import { addItem } from '@/store/cartSlice';
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductDetails {
   title: string;
   price: number;
+  id: number;
+  type: string;
+  collectionType: string;
+  slug: string;
   // brand: string;
   images: string[];
   // status: string;
 }
 
 const ProductLanding = ({ productDetails }: { productDetails: ProductDetails }) => {
-  // console.log(productDetails);
+  console.log("productDetails", productDetails);
+  const dispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const { toast } = useToast()
 
   // Mock data - replace with actual data from your backend
   const product: ProductDetails = {
     title: productDetails.title,
     price: productDetails.price,
-    // brand: "BASHOBYLA",
-    // status: "Ready to ship",
+    id: productDetails.id,
+    type: productDetails.type,
+    collectionType: productDetails.collectionType,
+    slug: productDetails.slug,
     images: productDetails.images,
   };
 
@@ -30,6 +41,24 @@ const ProductLanding = ({ productDetails }: { productDetails: ProductDetails }) 
 
   const increaseQuantity = () => {
     setQuantity(quantity + 1);
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+      dispatch(addItem({
+        id: productDetails.id.toString(),
+        title: productDetails.title,
+        price: productDetails.price,
+        quantity: quantity,
+        images: productDetails.images,
+        type:productDetails.type,
+        collectionType:productDetails.collectionType,
+        slug:productDetails.slug
+      }));
+      toast({
+        title: `${productDetails.title} added to cart`,
+        duration: 2000,
+      });
   };
 
   return (
@@ -107,7 +136,7 @@ const ProductLanding = ({ productDetails }: { productDetails: ProductDetails }) 
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <button className="w-full py-3 px-4 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            <button className="w-full py-3 px-4 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50" onClick={handleAddToCart}>
               Add to cart
             </button>
             <button className="w-full py-3 px-4 bg-black text-white rounded-md hover:bg-[#343332]">

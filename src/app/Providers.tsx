@@ -1,30 +1,24 @@
-// app/Providers.tsx
 "use client";
 
 import store, { persistor } from "@/store/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
-import { useEffect, useState } from "react";
 import { SessionProvider } from "next-auth/react";
+import React from "react";
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  const [isClient, setIsClient] = useState(false);
+interface ProvidersProps {
+  children: React.ReactNode;
+  session?: any; // session fetched server-side
+}
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
+export function Providers({ children, session }: ProvidersProps) {
   return (
-    <SessionProvider>
-    <Provider store={store}>
-      {isClient ? (
+    <SessionProvider session={session}>
+      <Provider store={store}>
         <PersistGate loading={null} persistor={persistor!}>
           {children}
         </PersistGate>
-      ) : (
-        children
-      )}
-    </Provider>
+      </Provider>
     </SessionProvider>
   );
 }

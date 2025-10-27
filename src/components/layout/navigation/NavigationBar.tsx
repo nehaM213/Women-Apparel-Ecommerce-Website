@@ -8,35 +8,28 @@ import { StickyNavBar } from "./StickyNavBar";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 
-interface NavigationBarProps {}
-
 const CartDrawer = dynamic(() => import("@/components/cart/CartDrawer"), {
   ssr: false,
 });
 
-const NavigationBar: React.FC<NavigationBarProps> = () => {
+const NavigationBar: React.FC = () => {
   const [isSticky, setIsSticky] = React.useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [openMenu, setOpenMenu] = React.useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
+
+  // ✅ Only client-side logic for OAuth / checkout
   const { status } = useSession();
 
-  // Listen for OAuth completion and open cart drawer
   React.useEffect(() => {
     if (status !== "authenticated") return;
-    try {
-      if (
-        typeof window !== "undefined" &&
-        localStorage.getItem("checkout_after_oauth") === "1"
-      ) {
-        setIsCartOpen(true);
-        localStorage.removeItem("checkout_after_oauth");
-      }
-    } catch (e) {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("checkout_after_oauth flag handling failed", e);
-      }
+    if (
+      typeof window !== "undefined" &&
+      localStorage.getItem("checkout_after_oauth") === "1"
+    ) {
+      setIsCartOpen(true);
+      localStorage.removeItem("checkout_after_oauth");
     }
   }, [status]);
 
@@ -62,27 +55,18 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
         drawerOpen={isDrawerOpen}
         toggleCart={setIsCartOpen}
       />
-      {/* sticky Nav bar for desktop */}
       <StickyNavBar
         isSearchOpen={isSearchOpen}
         toggleSearch={setIsSearchOpen}
-        toggleDrawer={setIsDrawerOpen}
-        isSticky={isSticky}
         toggleSticky={setIsSticky}
       />
-      {/* Drawer navigation menu for smaller screens */}
-      <Drawer
-        open={isDrawerOpen}
-        onOpenChange={setIsDrawerOpen}
-        direction="left"
-      >
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} direction="left">
         <NavDrawerContent
           setIsDrawerOpen={setIsDrawerOpen}
           toggleMenu={toggleMenu}
           openMenu={openMenu}
         />
       </Drawer>
-      {/* Cart Drawer for all viewports */}
       <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
     </div>
   );

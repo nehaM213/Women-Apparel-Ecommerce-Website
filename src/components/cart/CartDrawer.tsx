@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { FC, useCallback, useState } from "react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import LoginRegister from "@/components/LoginRegister";
+import LoginRegister from "@/components/auth/LoginRegister";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
@@ -23,38 +23,36 @@ interface CartDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const CartDrawer: React.FC<CartDrawerProps> = React.memo(({ open, onOpenChange }) => {
+const CartDrawer: FC<CartDrawerProps> = React.memo(({ open, onOpenChange }) => {
   const { cartItems, totalAmount, itemCount, updateQuantity, removeItem, isEmpty } = useCart();
   const { status } = useSession();
   const router = useRouter();
-  const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  const handleProceedToCheckout = React.useCallback(async () => {
+  const handleProceedToCheckout = useCallback(async () => {
     if (status === "authenticated") {
-      try {
-        onOpenChange(false);
-        router.push(`/checkout`);
-        return;
-      } catch (e) {
-        console.error("Navigate to checkout failed", e);
-        return;
-      }
+      onOpenChange(false);
+      router.push(`/checkout`);
+      return;
     }
     setIsCheckoutOpen(true);
   }, [status, onOpenChange, router]);
 
   return (
     <>
-      <Drawer
-        open={open}
-        onOpenChange={onOpenChange}
-        direction="right"
-      >
-        <DrawerContent className="right-0 left-auto w-full max-w-full sm:w-[90vw] md:w-[28rem] lg:w-[32rem] xl:w-[36rem] shadow-xl">
+      <Drawer open={open} onOpenChange={onOpenChange} direction="right">
+        <DrawerContent
+          className="right-0 left-auto w-full max-w-full sm:w-[90vw] md:w-[28rem] lg:w-[32rem] xl:w-[36rem] shadow-xl"
+          aria-modal="true"
+        >
           <div className="h-full flex flex-col">
             <CartHeader itemCount={itemCount} />
-
-            <div className="flex-1 overflow-auto p-4 pb-6" role="region" aria-label="Cart items">
+            <div
+              className="flex-1 overflow-auto p-4 pb-6"
+              role="region"
+              aria-label="Cart items"
+              aria-live="polite"
+            >
               {isEmpty ? (
                 <CartEmptyState onClose={() => onOpenChange(false)} />
               ) : (
@@ -70,11 +68,10 @@ const CartDrawer: React.FC<CartDrawerProps> = React.memo(({ open, onOpenChange }
                 </div>
               )}
             </div>
-
             {!isEmpty && (
-              <CartFooter 
-                totalAmount={totalAmount} 
-                onCheckout={handleProceedToCheckout} 
+              <CartFooter
+                totalAmount={totalAmount}
+                onCheckout={handleProceedToCheckout}
               />
             )}
           </div>
@@ -82,7 +79,7 @@ const CartDrawer: React.FC<CartDrawerProps> = React.memo(({ open, onOpenChange }
       </Drawer>
 
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-        <DialogContent>
+        <DialogContent aria-modal="true">
           <DialogHeader>
             <DialogTitle>Login or Sign up</DialogTitle>
             <DialogDescription>Login to continue to checkout</DialogDescription>
@@ -101,6 +98,6 @@ const CartDrawer: React.FC<CartDrawerProps> = React.memo(({ open, onOpenChange }
   );
 });
 
-CartDrawer.displayName = 'CartDrawer';
+CartDrawer.displayName = "CartDrawer";
 
 export default CartDrawer;
