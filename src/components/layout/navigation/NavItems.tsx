@@ -16,10 +16,12 @@ import { HiOutlineUser } from "react-icons/hi";
 import { signOut, useSession } from "next-auth/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import LoginRegister from "@/components/auth/LoginRegister";
+import { usePathname } from "next/navigation";
 
 export function NavItems({title,subItems,type}:{title?:string,subItems?:any[],type?:string}) {
   const { data: session, status } = useSession();
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+  const pathname = usePathname();
   
   return (
     <>
@@ -65,7 +67,7 @@ export function NavItems({title,subItems,type}:{title?:string,subItems?:any[],ty
                     />
                       <ListItem
                       title="Logout"
-                      onClick={() => signOut({ callbackUrl: '/' })}
+                      onClick={() => signOut({ callbackUrl: pathname  })}
                     />
                     </>
                     ) :

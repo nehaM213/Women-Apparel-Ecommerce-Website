@@ -4,10 +4,14 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import User from '@/models/User'
 import { connectToMongoDb } from '@/lib/db'
+import { redirect } from 'next/navigation'
 
 const page = async () => {
   await connectToMongoDb();
   const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect('/login');
+  }
   let addresses: any[] = [];
   if (session && session.user?.email) {
     const dbUser = await User.findOne({ email: session.user.email }).select('addresses').lean();

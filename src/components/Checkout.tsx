@@ -1,13 +1,21 @@
-"use client"
-import { useRouter } from 'next/navigation';
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import Image from 'next/image';
-import { Button } from './ui/button';
-import { useSession } from 'next-auth/react';
-import Script from 'next/script';
-import AddAddressModal from '@/components/user/AddAddressModal';
-import { clearCart } from '@/store/cartSlice';
+"use client";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import Image from "next/image";
+import { Button } from "./ui/button";
+import { useSession } from "next-auth/react";
+import Script from "next/script";
+import AddAddressModal from "@/components/user/AddAddressModal";
+import { clearCart } from "@/store/cartSlice";
+import LoginRegister from "@/components/auth/LoginRegister";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 type Address = {
   _id?: string;
@@ -30,47 +38,78 @@ type CheckoutProps = {
 const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
   const router = useRouter();
   const { status } = useSession();
-  const cartItems = useSelector((state:any) => state.cart.items);
+  const cartItems = useSelector((state: any) => state.cart.items);
   const dispatch = useDispatch();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const totalAmount = cartItems.reduce((total:any, item:any) => total + item.price * item.quantity, 0);
+  const totalAmount = cartItems.reduce(
+    (total: any, item: any) => total + item.price * item.quantity,
+    0
+  );
 
   const [addresses, setAddresses] = React.useState<Address[]>(initialAddresses);
-  const [selectedAddressId, setSelectedAddressId] = React.useState<string | null>(
-    () => {
-      const def = initialAddresses.find((a) => a.default);
-      return def?._id ?? initialAddresses[0]?._id ?? null;
+  const [selectedAddressId, setSelectedAddressId] = React.useState<
+    string | null
+  >(() => {
+    const def = initialAddresses.find((a) => a.default);
+    return def?._id ?? initialAddresses[0]?._id ?? null;
+  });
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      setShowLoginModal(true);
     }
-  );
-  const [loadingAddresses, setLoadingAddresses] = React.useState<boolean>(false);
+  }, [status]);
+  if (showLoginModal) {
+    return (
+      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+        <DialogContent aria-modal="true">
+          <DialogHeader>
+            <DialogTitle>Login Required</DialogTitle>
+            <DialogDescription>
+              Please login to continue checkout
+            </DialogDescription>
+          </DialogHeader>
+          <LoginRegister checkout onSuccess={() => setShowLoginModal(false)} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  const [loadingAddresses, setLoadingAddresses] =
+    React.useState<boolean>(false);
   const [razorpayLoaded, setRazorpayLoaded] = React.useState(false);
   const [showSummary, setShowSummary] = React.useState<boolean>(true);
   const [showAddressList, setShowAddressList] = React.useState<boolean>(false);
-  const [isAddAddressOpen, setIsAddAddressOpen] = React.useState<boolean>(false);
+  const [isAddAddressOpen, setIsAddAddressOpen] =
+    React.useState<boolean>(false);
   const [savingAddress, setSavingAddress] = React.useState<boolean>(false);
   const [addressError, setAddressError] = React.useState<string | null>(null);
   const [isMounted, setIsMounted] = React.useState(false);
-  const [pendingOrderId, setPendingOrderId] = React.useState<string | null>(null);
-  const [isProcessingPayment, setIsProcessingPayment] = React.useState<boolean>(false);
+  const [pendingOrderId, setPendingOrderId] = React.useState<string | null>(
+    null
+  );
+  const [isProcessingPayment, setIsProcessingPayment] =
+    React.useState<boolean>(false);
 
   React.useEffect(() => {
     setIsMounted(true);
   }, []);
 
   React.useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     if (window.Razorpay) {
       setRazorpayLoaded(true);
       return;
     }
-    const src = 'https://checkout.razorpay.com/v1/checkout.js';
-    let script = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
+    const src = "https://checkout.razorpay.com/v1/checkout.js";
+    let script = document.querySelector(
+      `script[src="${src}"]`
+    ) as HTMLScriptElement | null;
     if (!script) {
-      script = document.createElement('script');
+      script = document.createElement("script");
       script.src = src;
       script.async = true;
       script.onload = () => setRazorpayLoaded(true);
-      script.onerror = () => console.error('Failed to load Razorpay script');
+      script.onerror = () => console.error("Failed to load Razorpay script");
       document.body.appendChild(script);
     }
     const t = setInterval(() => {
@@ -88,10 +127,13 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
     const fetchAddresses = async () => {
       try {
         setLoadingAddresses(true);
-        const res = await fetch('/api/user/address');
+        const res = await fetch("/api/user/address");
         const data = await res.json();
         if (res.ok && Array.isArray(data.addresses)) {
-          const normalized = data.addresses.map((a: any) => ({ ...a, _id: a._id?.toString?.() || a._id }));
+          const normalized = data.addresses.map((a: any) => ({
+            ...a,
+            _id: a._id?.toString?.() || a._id,
+          }));
           setAddresses(normalized);
           const def = normalized.find((a: Address) => a.default);
           setSelectedAddressId(def?._id ?? normalized[0]?._id ?? null);
@@ -107,23 +149,28 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
     try {
       setSavingAddress(true);
       setAddressError(null);
-      const res = await fetch('/api/user/address', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/user/address", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(addr),
       });
       const data = await res.json();
       if (res.ok && Array.isArray(data.addresses)) {
-        const normalized = data.addresses.map((a: any) => ({ ...a, _id: a._id?.toString?.() || a._id }));
+        const normalized = data.addresses.map((a: any) => ({
+          ...a,
+          _id: a._id?.toString?.() || a._id,
+        }));
         setAddresses(normalized);
         const def = normalized.find((a: Address) => a.default);
-        setSelectedAddressId(def?._id ?? normalized[normalized.length - 1]?._id ?? null);
+        setSelectedAddressId(
+          def?._id ?? normalized[normalized.length - 1]?._id ?? null
+        );
         setShowAddressList(false);
       } else {
-        setAddressError(data.error || 'Failed to add address');
+        setAddressError(data.error || "Failed to add address");
       }
     } catch (e) {
-      setAddressError('Failed to add address');
+      setAddressError("Failed to add address");
     } finally {
       setSavingAddress(false);
       setIsAddAddressOpen(false);
@@ -136,20 +183,20 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
         return;
       }
       if (!razorpayLoaded || !window.Razorpay) {
-        console.error('Razorpay not loaded yet');
+        console.error("Razorpay not loaded yet");
         return;
       }
       if (!selectedAddressId) {
-        alert('Please select a delivery address first.');
+        alert("Please select a delivery address first.");
         return;
       }
 
       // Create order in our DB only if we don't already have a pending one
       let createData: any = { orderId: pendingOrderId };
       if (!pendingOrderId) {
-        const createRes = await fetch('/api/order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const createRes = await fetch("/api/order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             address: selectedAddress || undefined,
             items: cartItems,
@@ -159,16 +206,16 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
         createData = await createRes.json();
         console.log("createData", createData);
         if (!createRes.ok) {
-          alert(createData.error || 'Failed to create order');
+          alert(createData.error || "Failed to create order");
           return;
         }
         setPendingOrderId(createData.orderId);
       }
 
       // Create Razorpay order
-      const res = await fetch('/api/payment/razorpay/create-order', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/payment/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: Math.round(totalAmount * 100),
           orderId: createData.orderId || pendingOrderId,
@@ -179,52 +226,91 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
       const options: any = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
         amount: Math.round(totalAmount * 100),
-        currency: 'INR',
-        name: 'Lazuli By Neha',
-        description: 'Checkout',
+        currency: "INR",
+        name: "Lazuli By Neha",
+        description: "Checkout",
         image: "/logo.png",
         order_id: order.id,
-        theme: { color: '#3399cc' },
-        notes: { addressId: selectedAddressId, orderId: createData.orderId || pendingOrderId },
+        theme: { color: "#3399cc" },
+        notes: {
+          addressId: selectedAddressId,
+          orderId: createData.orderId || pendingOrderId,
+        },
         modal: {
           ondismiss: () => {
             setIsProcessingPayment(false);
-          }
+            try { rzp.close(); } catch(e) {}
+            window.location.href = "/payment-failed?reason=cancelled";
+          },
         },
         handler: async function (response: any) {
-          // ✅ This is where Razorpay sends you payment_id, order_id, signature
-          console.log("Payment Response:", response);
-      
-          // Now send it to your backend for verification
-          setIsProcessingPayment(true);
-          const verifyRes = await fetch('/api/payment/razorpay/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...response, orderId: createData.orderId || pendingOrderId }), // includes payment_id, order_id, signature, and our MongoDB orderId
-          });
-      
-          const verifyData = await verifyRes.json();
-      
-          if (verifyRes.ok) {
-            // Payment verified ✅
-            const finalOrderId = createData.orderId || pendingOrderId;
-            setPendingOrderId(null);
+          try {
+            // ✅ This is where Razorpay sends you payment_id, order_id, signature
+            console.log("Payment Response:", response);
+
+            // Now send it to your backend for verification
+            setIsProcessingPayment(true);
+            const verifyRes = await fetch("/api/payment/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...response,
+                orderId: createData.orderId || pendingOrderId,
+              }), // includes payment_id, order_id, signature, and our MongoDB orderId
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyRes.ok) {
+              // Payment verified ✅
+              const finalOrderId = createData.orderId || pendingOrderId;
+              setPendingOrderId(null);
+              setIsProcessingPayment(false);
+              // Clear cart after successful payment verification
+              dispatch(clearCart());
+              router.push("/order-confirmation/" + finalOrderId);
+            } else {
+              setIsProcessingPayment(false);
+              try { rzp.close(); } catch(e) {}
+              window.location.href = "/payment-failed?reason=verification_failed";
+              return;
+            }
+          } catch (err) {
+            console.error("Verification error:", err);
             setIsProcessingPayment(false);
-            // Clear cart after successful payment verification
-            dispatch(clearCart());
-            router.push('/order-confirmation/' + finalOrderId);
-          } else {
-            setIsProcessingPayment(false);
-            alert("Payment verification failed: " + (verifyData.error || "Unknown error"));
+            router.push(`/payment-failed?reason=network_error`);
           }
         },
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response: any) {
+        console.log("Payment Failed:", response);
+      
+        setIsProcessingPayment(false);
+      
+        // Mark failed order (optional but recommended)
+        if (createData?.orderId || pendingOrderId) {
+          fetch("/api/payment/razorpay/mark-failed", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderId: createData.orderId || pendingOrderId,
+              reason: response.error?.description || "Payment failed",
+            }),
+          });
+        }
+      
+        // Close Razorpay window
+        try { rzp.close(); } catch(e) {}
+      
+        // Hard redirect (fixes your issue)
+        window.location.href = `/payment-failed?reason=payment_failed`;
+      });
       setIsProcessingPayment(true);
       rzp.open();
     } catch (err) {
-      console.error('Razorpay init error:', err);
+      console.error("Razorpay init error:", err);
       setIsProcessingPayment(false);
     }
   };
@@ -242,15 +328,23 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
       />
       <div className="min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-semibold truncate">{addr.firstName} {addr.lastName}</span>
+          <span className="font-semibold truncate">
+            {addr.firstName} {addr.lastName}
+          </span>
           {addr.default && (
-            <span className="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded">Default</span>
+            <span className="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded">
+              Default
+            </span>
           )}
         </div>
-        <div className="text-sm text-muted-foreground truncate">{addr.company}</div>
+        <div className="text-sm text-muted-foreground truncate">
+          {addr.company}
+        </div>
         <div className="text-sm truncate">{addr.addressLine1}</div>
         <div className="text-sm truncate">{addr.addressLine2}</div>
-        <div className="text-sm truncate">{addr.city}, {addr.country} {addr.postalCode}</div>
+        <div className="text-sm truncate">
+          {addr.city}, {addr.country} {addr.postalCode}
+        </div>
         <div className="text-sm truncate">Contact: {addr.contactNumber}</div>
       </div>
     </label>
@@ -261,7 +355,7 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
       <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
       <div className="grid grid-cols-1 gap-4">
         {isMounted ? (
-          cartItems.map((item:any) => (
+          cartItems.map((item: any) => (
             <div key={item.id} className="flex items-center border-b py-2">
               <Image
                 src={item.images[0]}
@@ -274,7 +368,9 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
                 <h3 className="text-sm font-semibold truncate">{item.title}</h3>
                 <p className="text-gray-600 text-xs">Qty: {item.quantity}</p>
               </div>
-              <p className="text-sm font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
+              <p className="text-sm font-semibold">
+                ₹{(item.price * item.quantity).toFixed(2)}
+              </p>
             </div>
           ))
         ) : (
@@ -283,25 +379,27 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
       </div>
       <div className="mt-4 flex justify-between">
         <h2 className="text-xl font-bold">Total:</h2>
-        <p className="text-xl font-bold">₹{isMounted ? totalAmount.toFixed(2) : (0).toFixed(2)}</p>
+        <p className="text-xl font-bold">
+          ₹{isMounted ? totalAmount.toFixed(2) : (0).toFixed(2)}
+        </p>
       </div>
     </div>
   );
 
   return (
     <>
-      <Script 
-        src="https://checkout.razorpay.com/v1/checkout.js" 
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="afterInteractive"
         onLoad={() => setRazorpayLoaded(true)}
-        onError={() => console.error('Failed to load Razorpay script')}
+        onError={() => console.error("Failed to load Razorpay script")}
       />
 
       <div className="container mx-auto p-4">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold">Checkout</h1>
           <Button variant="outline" onClick={() => setShowSummary((s) => !s)}>
-            {showSummary ? 'Hide Order Summary' : 'Show Order Summary'}
+            {showSummary ? "Hide Order Summary" : "Show Order Summary"}
           </Button>
         </div>
 
@@ -312,27 +410,49 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-2xl font-bold">Delivery Address</h2>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setShowAddressList((s) => !s)}>
-                    {showAddressList ? 'Hide list' : 'Change'}
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAddressList((s) => !s)}
+                  >
+                    {showAddressList ? "Hide list" : "Change"}
                   </Button>
-                  <Button onClick={() => setIsAddAddressOpen(true)}>Add New</Button>
+                  <Button onClick={() => setIsAddAddressOpen(true)}>
+                    Add New
+                  </Button>
                 </div>
               </div>
 
               {loadingAddresses ? (
-                <p className="text-sm text-muted-foreground">Loading addresses...</p>
+                <p className="text-sm text-muted-foreground">
+                  Loading addresses...
+                </p>
               ) : addresses.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No addresses found. Please add one.</p>
+                <p className="text-sm text-muted-foreground">
+                  No addresses found. Please add one.
+                </p>
               ) : (
                 <>
                   {selectedAddress && (
                     <div className="mt-2">
                       <div className="border rounded p-4 bg-gray-50">
-                        <div className="font-semibold">{selectedAddress.firstName} {selectedAddress.lastName}</div>
-                        <div className="text-sm">{selectedAddress.addressLine1}</div>
-                        {selectedAddress.addressLine2 && <div className="text-sm">{selectedAddress.addressLine2}</div>}
-                        <div className="text-sm">{selectedAddress.city}, {selectedAddress.country} {selectedAddress.postalCode}</div>
-                        <div className="text-sm">Contact: {selectedAddress.contactNumber}</div>
+                        <div className="font-semibold">
+                          {selectedAddress.firstName} {selectedAddress.lastName}
+                        </div>
+                        <div className="text-sm">
+                          {selectedAddress.addressLine1}
+                        </div>
+                        {selectedAddress.addressLine2 && (
+                          <div className="text-sm">
+                            {selectedAddress.addressLine2}
+                          </div>
+                        )}
+                        <div className="text-sm">
+                          {selectedAddress.city}, {selectedAddress.country}{" "}
+                          {selectedAddress.postalCode}
+                        </div>
+                        <div className="text-sm">
+                          Contact: {selectedAddress.contactNumber}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -345,28 +465,35 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
                     </div>
                   )}
 
-                  {addressError && <div className="text-red-600 mt-2">{addressError}</div>}
+                  {addressError && (
+                    <div className="text-red-600 mt-2">{addressError}</div>
+                  )}
                 </>
               )}
             </div>
 
             <div className="bg-white shadow-md rounded-lg p-6">
               <h2 className="text-2xl font-bold mb-4">Payment</h2>
-              <p className="text-sm text-muted-foreground mb-4">Pay securely with Razorpay. Ensure you have selected a delivery address.</p>
-              <Button 
+              <p className="text-sm text-muted-foreground mb-4">
+                Pay securely with Razorpay. Ensure you have selected a delivery
+                address.
+              </p>
+              <Button
                 className="w-full"
                 onClick={startRazorpay}
                 disabled={!razorpayLoaded || cartItems.length === 0}
               >
-                {razorpayLoaded ? (savingAddress ? 'Please wait...' : 'Proceed to Payment') : 'Preparing payment...'}
+                {razorpayLoaded
+                  ? savingAddress
+                    ? "Please wait..."
+                    : "Proceed to Payment"
+                  : "Preparing payment..."}
               </Button>
             </div>
           </div>
 
           {/* Right: Order Summary */}
-          <div className="lg:col-span-1">
-            {showSummary && <Summary />}
-          </div>
+          <div className="lg:col-span-1">{showSummary && <Summary />}</div>
         </div>
       </div>
 
