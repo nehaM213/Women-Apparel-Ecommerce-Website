@@ -11,7 +11,7 @@
   "dependencies": {
     "@edgestore/react": "^0.3.3",
     "@edgestore/server": "^0.3.3",
-    "@hookform/resolvers": "^3.9.0",
+    "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.1.3",
     "@radix-ui/react-dialog": "^1.1.4",
@@ -48,7 +48,7 @@
     "react-dom": "^18.3.1",
     "react-draggable": "^4.4.6",
     "react-dropzone": "^14.3.8",
-    "react-hook-form": "^7.52.2",
+    "react-hook-form": "^7.65.0",
     "react-icons": "^5.2.1",
     "react-phone-input-2": "^2.15.1",
     "react-stickynode": "^4.1.1",
@@ -58,7 +58,7 @@
     "tailwindcss-animate": "^1.0.7",
     "twilio": "^5.6.1",
     "vaul": "^0.9.1",
-    "zod": "^3.24.2",
+    "zod": "^3.25.76",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

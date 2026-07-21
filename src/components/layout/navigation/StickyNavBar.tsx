@@ -84,7 +84,7 @@ export const StickyNavBar: React.FC<StickyNavBarProps> = ({
             onClick={() => toggleSearch(!isSearchOpen)}
             className="p-1"
           >
-            <HiOutlineSearch className="w-8 h-8 cursor-pointer" strokeWidth={1.0} />
+            <HiOutlineSearch className="w-8 h-8 cursor-pointer rotate-[86deg]" strokeWidth={1.0} />
           </button>
           <NavItems type="user" subItems={[]} />
           <button
@@ -95,7 +95,7 @@ export const StickyNavBar: React.FC<StickyNavBarProps> = ({
             aria-controls="cart-drawer"
             aria-expanded={isCartOpen}
           >
-            <HiOutlineShoppingBag className="w-8 h-8 cursor-pointer" strokeWidth={1.0} />
+            <HiOutlineShoppingBag className="w-8 h-8 cursor-pointer rotate-[446deg]" strokeWidth={1.0} />
             {isMounted && cartCount > 0 && (
               <span
                 className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1 transform translate-x-1 -translate-y-1"

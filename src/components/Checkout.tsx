@@ -2,7 +2,6 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Image from "next/image";
 import { Button } from "./ui/button";
 import { useSession } from "next-auth/react";
 import Script from "next/script";
@@ -16,6 +15,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import CartItem from "./cart/CartItem";
 
 type Address = {
   _id?: string;
@@ -77,7 +77,12 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
   const [loadingAddresses, setLoadingAddresses] =
     React.useState<boolean>(false);
   const [razorpayLoaded, setRazorpayLoaded] = React.useState(false);
-  const [showSummary, setShowSummary] = React.useState<boolean>(true);
+  const [showSummary, setShowSummary] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 1024; // show only on desktop
+    }
+    return false;
+  });
   const [showAddressList, setShowAddressList] = React.useState<boolean>(false);
   const [isAddAddressOpen, setIsAddAddressOpen] =
     React.useState<boolean>(false);
@@ -87,6 +92,7 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
   const [pendingOrderId, setPendingOrderId] = React.useState<string | null>(
     null
   );
+
   const [isProcessingPayment, setIsProcessingPayment] =
     React.useState<boolean>(false);
 
@@ -161,10 +167,8 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
           _id: a._id?.toString?.() || a._id,
         }));
         setAddresses(normalized);
-        const def = normalized.find((a: Address) => a.default);
-        setSelectedAddressId(
-          def?._id ?? normalized[normalized.length - 1]?._id ?? null
-        );
+        const newlyAdded = normalized[normalized.length - 1];
+        setSelectedAddressId(newlyAdded?._id ?? null);
         setShowAddressList(false);
       } else {
         setAddressError(data.error || "Failed to add address");
@@ -239,7 +243,9 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
         modal: {
           ondismiss: () => {
             setIsProcessingPayment(false);
-            try { rzp.close(); } catch(e) {}
+            try {
+              rzp.close();
+            } catch (e) {}
             window.location.href = "/payment-failed?reason=cancelled";
           },
         },
@@ -271,8 +277,11 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
               router.push("/order-confirmation/" + finalOrderId);
             } else {
               setIsProcessingPayment(false);
-              try { rzp.close(); } catch(e) {}
-              window.location.href = "/payment-failed?reason=verification_failed";
+              try {
+                rzp.close();
+              } catch (e) {}
+              window.location.href =
+                "/payment-failed?reason=verification_failed";
               return;
             }
           } catch (err) {
@@ -286,9 +295,9 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", function (response: any) {
         console.log("Payment Failed:", response);
-      
+
         setIsProcessingPayment(false);
-      
+
         // Mark failed order (optional but recommended)
         if (createData?.orderId || pendingOrderId) {
           fetch("/api/payment/razorpay/mark-failed", {
@@ -300,10 +309,12 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
             }),
           });
         }
-      
+
         // Close Razorpay window
-        try { rzp.close(); } catch(e) {}
-      
+        try {
+          rzp.close();
+        } catch (e) {}
+
         // Hard redirect (fixes your issue)
         window.location.href = `/payment-failed?reason=payment_failed`;
       });
@@ -356,22 +367,11 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
       <div className="grid grid-cols-1 gap-4">
         {isMounted ? (
           cartItems.map((item: any) => (
-            <div key={item.id} className="flex items-center border-b py-2">
-              <Image
-                src={item.images[0]}
-                alt={item.title}
-                width={72}
-                height={72}
-                className="rounded-md mr-3 w-18 h-18 object-cover"
-              />
-              <div className="flex-grow min-w-0">
-                <h3 className="text-sm font-semibold truncate">{item.title}</h3>
-                <p className="text-gray-600 text-xs">Qty: {item.quantity}</p>
-              </div>
-              <p className="text-sm font-semibold">
-                ₹{(item.price * item.quantity).toFixed(2)}
-              </p>
-            </div>
+            <CartItem
+              key={item.id}
+              item={item}
+              summary // 👈 Enables summary mode
+            />
           ))
         ) : (
           <div className="h-24 bg-gray-100 rounded animate-pulse" />
@@ -404,19 +404,27 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {showSummary && (
+            <div className="lg:hidden">
+              <Summary />
+            </div>
+          )}
           {/* Left: Address + Payment */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white shadow-md rounded-lg p-6">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
                 <h2 className="text-2xl font-bold">Delivery Address</h2>
-                <div className="flex gap-2">
+
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     onClick={() => setShowAddressList((s) => !s)}
+                    disabled={addresses.length > 1 || loadingAddresses}
                   >
                     {showAddressList ? "Hide list" : "Change"}
                   </Button>
-                  <Button onClick={() => setIsAddAddressOpen(true)}>
+
+                  <Button onClick={() => setIsAddAddressOpen(true)} disabled={loadingAddresses || isAddAddressOpen}>
                     Add New
                   </Button>
                 </div>
@@ -458,8 +466,8 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
                   )}
 
                   {showAddressList && (
-                    <div className="grid gap-4 md:grid-cols-2 mt-4">
-                      {addresses.map((addr: Address) => (
+                    <div className="grid gap-4 md:grid-cols-2 mt-4 max-h-72 overflow-y-auto pr-2">
+                      {addresses.slice(0, 20).map((addr: Address) => (
                         <AddressCard key={addr._id} addr={addr} />
                       ))}
                     </div>
@@ -493,7 +501,9 @@ const Checkout: React.FC<CheckoutProps> = ({ initialAddresses = [] }) => {
           </div>
 
           {/* Right: Order Summary */}
-          <div className="lg:col-span-1">{showSummary && <Summary />}</div>
+          <div className="hidden lg:block lg:col-span-1">
+            {showSummary && <Summary />}
+          </div>
         </div>
       </div>
 

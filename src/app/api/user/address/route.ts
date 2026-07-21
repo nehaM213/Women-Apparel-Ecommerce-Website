@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import User from '@/models/User';
 import { connectToMongoDb } from '@/lib/db';
+import { addressSchema } from "@/schemas/addressSchema";
 
 export async function POST(req: Request) {
   await connectToMongoDb();
@@ -12,7 +13,18 @@ export async function POST(req: Request) {
   }
   const body = await req.json();
   // If default is true, unset default on all other addresses
-  if (body.default) {
+
+  const result = addressSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: result.error.errors[0].message },
+      { status: 400 }
+    );
+  }
+
+  const validatedData = result.data;
+
+  if (validatedData.default) {
     await User.updateOne(
       { email: session.user.email },
       { $set: { 'addresses.$[].default': false } }
@@ -20,7 +32,7 @@ export async function POST(req: Request) {
   }
   const user = await User.findOneAndUpdate(
     { email: session.user.email },
-    { $push: { addresses: body } },
+    { $push: { addresses: validatedData } },
     { new: true, select: 'addresses' }
   );
   if (!user) {
@@ -36,36 +48,50 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const body = await req.json();
-  if (!body._id) {
+
+  const result = addressSchema.safeParse(body);
+  // console.log("body", body._id);
+  // console.log("result", result);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: result.error.errors[0].message },
+      { status: 400 }
+    );
+  }
+
+  const validatedData = result.data;
+  if (!validatedData._id) {
     return NextResponse.json({ error: 'Address ID required' }, { status: 400 });
   }
   // If default is true, unset default on all other addresses
-  if (body.default) {
+  if (validatedData.default) {
     await User.updateOne(
       { email: session.user.email },
       { $set: { 'addresses.$[].default': false } }
     );
   }
   const user = await User.findOneAndUpdate(
-    { email: session.user.email, 'addresses._id': body._id },
+    { email: session.user.email, 'addresses._id': validatedData._id },
     {
-      $set: {
-        'addresses.$.firstName': body.firstName,
-        'addresses.$.lastName': body.lastName,
-        'addresses.$.addressLine1': body.addressLine1,
-        'addresses.$.addressLine2': body.addressLine2,
-        'addresses.$.company': body.company,
-        'addresses.$.postalCode': body.postalCode,
-        'addresses.$.contactNumber': body.contactNumber,
-        'addresses.$.city': body.city,
-        'addresses.$.country': body.country,
-        'addresses.$.default': !!body.default,
-      },
+      $set: { 'addresses.$': validatedData }
     },
     { new: true, select: 'addresses' }
   );
   if (!user) {
     return NextResponse.json({ error: 'User or address not found' }, { status: 404 });
+  }
+  return NextResponse.json({ success: true, addresses: user.addresses });
+}
+
+export async function GET(req: Request) {
+  await connectToMongoDb();
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const user = await User.findOne({ email: session.user.email }).select('addresses');
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
   return NextResponse.json({ success: true, addresses: user.addresses });
 } 

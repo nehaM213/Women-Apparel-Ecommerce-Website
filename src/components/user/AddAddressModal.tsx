@@ -1,202 +1,111 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addressSchema } from "@/schemas/addressSchema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-type Address = {
-  firstName?: string;
-  lastName?: string;
-  addressLine1?: string;
-  addressLine2?: string;
-  company?: string;
-  postalCode?: string;
-  contactNumber?: string;
-  city?: string;
-  country?: string;
-  default?: boolean;
-  _id?: string;
-};
+type AddressFormData = z.infer<typeof addressSchema>;
 
-type AddAddressModalProps = {
-  open: boolean;
-  onClose: () => void;
-  onAddAddress: (address: Address) => void;
-  initialData?: Address;
-};
-
-const initialAddress: Address = {
-  firstName: "",
-  lastName: "",
-  addressLine1: "",
-  addressLine2: "",
-  company: "",
-  postalCode: "",
-  contactNumber: "",
-  city: "",
-  country: "",
-  default: false,
-};
-
-const AddAddressModal: React.FC<AddAddressModalProps> = ({
-  open,
-  onClose,
-  onAddAddress,
-  initialData,
-}) => {
-  const [formState, setFormState] = useState<Address>(initialAddress);
-  const [submitting, setSubmitting] = useState(false);
+const AddAddressModal = ({ open, onClose, onAddAddress, initialData }: any) => {
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } =
+    useForm<AddressFormData>({
+      resolver: zodResolver(addressSchema),
+      defaultValues: initialData || {},
+    });
 
   useEffect(() => {
-    if (initialData && open) {
-      setFormState(initialData);
-    } else if (open) {
-      setFormState(initialAddress);
-    }
-  }, [initialData, open]);
+    if (initialData) reset(initialData);
+    else reset({});
+  }, [initialData, open, reset]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
-    let fieldValue: string | boolean = value;
-    if (type === "checkbox") {
-      fieldValue = (e.target as HTMLInputElement).checked;
-    }
-    setFormState((prev) => ({
-      ...prev,
-      [name]: fieldValue,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    onAddAddress(formState);
-    setSubmitting(false);
+  const onSubmit = (data: AddressFormData) => {
+    onAddAddress(data);
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
-      <DialogContent className="sm:max-w-lg">
+    <Dialog open={open} onOpenChange={(state) => !state && onClose()}>
+      <DialogContent className="max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Address' : 'Add New Address'}</DialogTitle>
+          <DialogTitle>{initialData ? "Edit Address" : "Add Address"}</DialogTitle>
           <DialogDescription>
-            Please provide your delivery details. Fields marked with * are required.
+            Fields marked with <span className="text-red-500">*</span> are required.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="firstName">First Name *</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                value={formState.firstName}
-                onChange={handleChange}
-                placeholder="First Name"
-                required
-              />
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+          {/* First Name */}
+          <div className="space-y-1">
+            <Label>First Name *</Label>
+            <Input {...register("firstName")} placeholder="First Name" />
+            {errors.firstName && <p className="text-red-500 text-xs">{errors.firstName.message}</p>}
+          </div>
+
+          {/* Last Name */}
+          <div className="space-y-1">
+            <Label>Last Name *</Label>
+            <Input {...register("lastName")} placeholder="Last Name" />
+            {errors.lastName && <p className="text-red-500 text-xs">{errors.lastName.message}</p>}
+          </div>
+
+          {/* Address Line 1 */}
+          <div className="space-y-1">
+            <Label>Address Line 1 *</Label>
+            <Input {...register("addressLine1")} placeholder="House no., Street" />
+            {errors.addressLine1 && <p className="text-red-500 text-xs">{errors.addressLine1.message}</p>}
+          </div>
+
+          {/* Address Line 2 */}
+          <div className="space-y-1">
+            <Label>Address Line 2</Label>
+            <Input {...register("addressLine2")} placeholder="Landmark" />
+          </div>
+
+          {/* City & Country */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label>City *</Label>
+              <Input {...register("city")} placeholder="City" />
+              {errors.city && <p className="text-red-500 text-xs">{errors.city.message}</p>}
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="lastName">Last Name *</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                value={formState.lastName}
-                onChange={handleChange}
-                placeholder="Last Name"
-                required
-              />
+
+            <div className="space-y-1">
+              <Label>Country *</Label>
+              <Input {...register("country")} placeholder="Country" />
+              {errors.country && <p className="text-red-500 text-xs">{errors.country.message}</p>}
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="addressLine1">Address Line 1 *</Label>
-            <Input
-              id="addressLine1"
-              name="addressLine1"
-              value={formState.addressLine1}
-              onChange={handleChange}
-              placeholder="House no., Street, Area"
-              required
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="addressLine2">Address Line 2</Label>
-            <Input
-              id="addressLine2"
-              name="addressLine2"
-              value={formState.addressLine2}
-              onChange={handleChange}
-              placeholder="Landmark, Building, etc."
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="city">City *</Label>
-              <Input
-                id="city"
-                name="city"
-                value={formState.city}
-                onChange={handleChange}
-                placeholder="City"
-                required
-              />
+          {/* Postal & Contact */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label>Postal Code *</Label>
+              <Input {...register("postalCode")} placeholder="110001" />
+              {errors.postalCode && <p className="text-red-500 text-xs">{errors.postalCode.message}</p>}
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="country">Country *</Label>
-              <Input
-                id="country"
-                name="country"
-                value={formState.country}
-                onChange={handleChange}
-                placeholder="Country"
-                required
-              />
+
+            <div className="space-y-1">
+              <Label>Contact Number *</Label>
+              <Input {...register("contactNumber")} placeholder="9876543210" />
+              {errors.contactNumber && <p className="text-red-500 text-xs">{errors.contactNumber.message}</p>}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="postalCode">Postal/Zip Code *</Label>
-              <Input
-                id="postalCode"
-                name="postalCode"
-                value={formState.postalCode}
-                onChange={handleChange}
-                placeholder="e.g., 110001"
-                required
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="contactNumber">Contact Number *</Label>
-              <Input
-                id="contactNumber"
-                name="contactNumber"
-                value={formState.contactNumber}
-                onChange={handleChange}
-                placeholder="e.g., +91 9876543210"
-                required
-              />
-            </div>
-          </div>
-
+          {/* Default Checkbox */}
           <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="default"
-              checked={!!formState.default}
-              onChange={handleChange}
-            />
+            <input type="checkbox" {...register("default")} />
             Set as default address
           </label>
 
-          <div className="flex gap-2 justify-end pt-2">
+          <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={submitting}>{initialData ? 'Update' : 'Save'}</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {initialData ? "Update" : "Save"}
+            </Button>
           </div>
         </form>
       </DialogContent>

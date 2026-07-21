@@ -56,11 +56,15 @@ const DeliveryAddress: React.FC<DeliveryAddressProps> = ({ addresses: initialAdd
   const handleUpdateAddress = async (address: Address) => {
     setLoading(true);
     setError(null);
+    // _id is not in the address object, so we need to add it
+    address._id = editAddress?._id;
+    // console.log("address", address);  
     try {
       const res = await fetch('/api/user/address', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(address),
+
       });
       const data = await res.json();
       if (res.ok && data.addresses) {
